@@ -45,6 +45,6 @@ project = Hoe.spec('pkg-config') do |project|
     :has_rdoc => false,
   }
   news = base_dir + "NEWS"
-  project.changes = news.read.gsub(/^== (?m:.*)/, '')
+  project.changes = news.read.split(/^== .*$/)[1].strip
   project.description = "A pkg-cofnig implementation by Ruby"
 end
