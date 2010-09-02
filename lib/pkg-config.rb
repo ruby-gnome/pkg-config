@@ -23,14 +23,17 @@ require 'pathname'
 
 class PackageConfig
   attr_accessor :msvc_syntax
-  def initialize(name, path=nil, msvc_syntax=false)
+  def initialize(name, options={})
     @name = name
-    @path = path || ENV["PKG_CONFIG_PATH"]
+    @options = options
+    @path = @options[:path] || ENV["PKG_CONFIG_PATH"]
     @path = [@path, guess_default_path].compact.join(separator)
-    @msvc_syntax = msvc_syntax
+    @msvc_syntax = @options[:msvc_syntax]
     @variables = @declarations = nil
     override_variables = with_config("override-variables", "")
     @override_variables = parse_override_variables(override_variables)
+    default_override_variables = @options[:override_variables] || {}
+    @override_variables = default_override_variables.merge(@override_variables)
   end
 
   def exist?
@@ -93,12 +96,12 @@ class PackageConfig
   end
 
   def separator
-    File.expand_path(".").index(":") ? ";" : ":"
+    File::PATH_SEPARATOR
   end
 
   def collect_cflags
     all_cflags = (requires_private + requires.reverse).collect do |package|
-      self.class.new(package, @path, @msvc_syntax).cflags
+      self.class.new(package, @options).cflags
     end
     all_cflags = [declaration("Cflags")] + all_cflags
     all_cflags = all_cflags.join(" ").gsub(/-I /, '-I').split.uniq
@@ -116,7 +119,7 @@ class PackageConfig
 
   def collect_libs
     all_libs = requires.collect do |package|
-      self.class.new(package, @path, @msvc_syntax).libs
+      self.class.new(package, @options).libs
     end
     all_libs = [declaration("Libs")] + all_libs
     all_libs = all_libs.join(" ").gsub(/-([Ll]) /, '\1').split.uniq
@@ -253,13 +256,27 @@ end
 module PKGConfig
   VERSION = "1.0.3"
 
+  @@path = nil
+  @@override_variables = {}
+
   module_function
+  def add_path(path)
+    @@path = [path, @@path || ''].join(File::PATH_SEPARATOR)
+  end
+
+  def set_override_variable(key, value)
+    @@override_variables[key] = value
+  end
+
   def msvc?
     /mswin32/.match(RUBY_PLATFORM) and /^cl\b/.match(Config::CONFIG['CC'])
   end
 
   def package_config(package)
-    PackageConfig.new(package, nil, msvc?)
+    PackageConfig.new(package,
+                      :path => @@path,
+                      :msvc_syntax => msvc?,
+                      :override_variables => @@override_variables)
   end
 
   def exist?(pkg)
