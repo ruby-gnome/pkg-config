@@ -76,6 +76,10 @@ class PackageConfig
     declaration("Version")
   end
 
+  def description
+    declaration("Description")
+  end
+
   def variable(name)
     parse_pc if @variables.nil?
     expand_value(@override_variables[name] || @variables[name])
@@ -301,6 +305,10 @@ module PKGConfig
 
   def modversion(pkg)
     package_config(pkg).version
+  end
+
+  def description(pkg)
+    package_config(pkg).description
   end
 
   def check_version?(pkg, major = 0, minor = 0, micro = 0)
