@@ -1,0 +1,7 @@
+LGPL-2.1
+NEWS
+README.rdoc
+Rakefile
+lib/pkg-config.rb
+test/run-test.rb
+test/test_pkg_config.rb

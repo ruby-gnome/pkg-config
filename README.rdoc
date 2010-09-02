@@ -1,0 +1,38 @@
+= README
+
+== Name
+
+pkg-config
+
+== Description
+
+A pkg-config implementation by Ruby.
+
+== Dependencies
+
+* ruby >= 1.8 (1.9.2 also supported!)
+
+== Install
+
+  # gem install pkg-config
+
+== Documents
+
+* TODO
+
+== Source
+
+There is the pkg-config repository at GitHub:
+http://github.com/rcairo/pkg-config
+
+== License
+
+LGPLv2+
+
+== Mailing list
+
+TODO
+
+== Thanks
+
+* ...
