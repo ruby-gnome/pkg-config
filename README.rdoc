@@ -14,7 +14,14 @@ A pkg-config implementation by Ruby.
 
 == Install
 
+=== Package
+
   # gem install pkg-config
+
+=== No package
+
+  % ruby extconf.rb
+  # make install
 
 == Documents
 

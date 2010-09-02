@@ -251,7 +251,7 @@ class PackageConfig
 end
 
 module PKGConfig
-  VERSION = "1.0.0"
+  VERSION = "1.0.1"
 
   module_function
   def msvc?
