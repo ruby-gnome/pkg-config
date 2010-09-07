@@ -48,3 +48,8 @@ project = Hoe.spec('pkg-config') do |project|
   project.changes = news.read.split(/^== .*$/)[1].strip
   project.description = "A pkg-cofnig implementation by Ruby"
 end
+
+desc "tag the current veresion"
+task :tag do
+  sh("git", "tag", "-a", version.to_s, "-m", "release #{version}!!!")
+end
