@@ -258,7 +258,7 @@ class PackageConfig
 end
 
 module PKGConfig
-  VERSION = "1.0.3"
+  VERSION = "1.0.4"
 
   @@path = nil
   @@override_variables = {}
