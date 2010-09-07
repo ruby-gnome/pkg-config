@@ -52,4 +52,5 @@ end
 desc "tag the current veresion"
 task :tag do
   sh("git", "tag", "-a", version.to_s, "-m", "release #{version}!!!")
+  sh("git", "push", "--tags")
 end
