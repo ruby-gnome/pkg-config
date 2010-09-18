@@ -22,25 +22,15 @@ require 'English'
 require 'pathname'
 
 class PackageConfig
-  @@default_prepend_paths = []
-  @@default_append_paths = []
+  SEPARATOR = File::PATH_SEPARATOR
 
-  class << self
-    def prepend_default_path(path)
-      @@default_prepend_paths.unshift(path)
-    end
-
-    def append_default_path(path)
-      @@default_append_paths << path
-    end
-  end
-
+  attr_reader :paths
   attr_accessor :msvc_syntax
   def initialize(name, options={})
     @name = name
     @options = options
-    @path = @options[:path] || ENV["PKG_CONFIG_PATH"]
-    @path = [@path, guess_default_path].compact.join(separator)
+    path = @options[:path] || ENV["PKG_CONFIG_PATH"]
+    @paths = [path, guess_default_path].compact.join(SEPARATOR).split(SEPARATOR)
     @msvc_syntax = @options[:msvc_syntax]
     @variables = @declarations = nil
     override_variables = with_config("override-variables", "")
@@ -104,23 +94,12 @@ class PackageConfig
   end
 
   private
-  def paths
-    paths = @@default_prepend_paths
-    paths += @path.split(separator)
-    paths += @@default_append_paths
-    paths
-  end
-
   def pc
-    paths.each do |path|
+    @paths.each do |path|
       pc_name = File.join(path, "#{@name}.pc")
       return pc_name if File.exist?(pc_name)
     end
     return nil
-  end
-
-  def separator
-    File::PATH_SEPARATOR
   end
 
   def collect_cflags
@@ -208,7 +187,7 @@ class PackageConfig
   end
 
   def search_pkg_config_from_path(pkg_config)
-    (ENV["PATH"] || "").split(separator).each do |path|
+    (ENV["PATH"] || "").split(SEPARATOR).each do |path|
       try_pkg_config = Pathname(path) + pkg_config
       return try_pkg_config if try_pkg_config.exist?
     end
@@ -255,9 +234,9 @@ class PackageConfig
                     "/usr/lib64/pkgconfig",
                     "/usr/lib/pkgconfig",
                     "/usr/X11/lib/pkgconfig/",
-                    "/usr/share/pkgconfig"].join(separator)
+                    "/usr/share/pkgconfig"].join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
-    default_path = [libdir, default_path].join(separator) if libdir
+    default_path = [libdir, default_path].join(SEPARATOR) if libdir
 
     pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
     pkg_config = Pathname.new(pkg_config)
@@ -273,19 +252,19 @@ class PackageConfig
     return default_path unless pkg_config.absolute?
     [(pkg_config.parent.parent + "lib" + "pkgconfig").to_s,
      (pkg_config.parent.parent + "libdata" + "pkgconfig").to_s,
-     default_path].join(separator)
+     default_path].join(SEPARATOR)
   end
 end
 
 module PKGConfig
   VERSION = "1.0.4"
 
-  @@path = nil
+  @@paths = []
   @@override_variables = {}
 
   module_function
   def add_path(path)
-    @@path = [path, @@path || ''].join(File::PATH_SEPARATOR)
+    @@paths << path
   end
 
   def set_override_variable(key, value)
@@ -297,10 +276,11 @@ module PKGConfig
   end
 
   def package_config(package)
-    PackageConfig.new(package,
-                      :path => @@path,
-                      :msvc_syntax => msvc?,
-                      :override_variables => @@override_variables)
+    config = PackageConfig.new(package,
+                               :msvc_syntax => msvc?,
+                               :override_variables => @@override_variables)
+    config.paths.unshift(*@@paths)
+    config
   end
 
   def exist?(pkg)
