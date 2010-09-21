@@ -31,6 +31,7 @@ class PackageConfig
     @options = options
     path = @options[:path] || ENV["PKG_CONFIG_PATH"]
     @paths = [path, guess_default_path].compact.join(SEPARATOR).split(SEPARATOR)
+    @paths.unshift(@options[:paths] || [])
     @msvc_syntax = @options[:msvc_syntax]
     @variables = @declarations = nil
     override_variables = with_config("override-variables", "")
@@ -276,11 +277,10 @@ module PKGConfig
   end
 
   def package_config(package)
-    config = PackageConfig.new(package,
-                               :msvc_syntax => msvc?,
-                               :override_variables => @@override_variables)
-    config.paths.unshift(*@@paths)
-    config
+    PackageConfig.new(package,
+                      :msvc_syntax => msvc?,
+                      :override_variables => @@override_variables,
+                      :paths => @@paths)
   end
 
   def exist?(pkg)
