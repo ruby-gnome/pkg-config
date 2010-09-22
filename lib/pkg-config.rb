@@ -311,6 +311,10 @@ module PKGConfig
     package_config(pkg).description
   end
 
+  def variable(pkg, name)
+    package_config(pkg).variable(name)
+  end
+
   def check_version?(pkg, major = 0, minor = 0, micro = 0)
     return false unless exist?(pkg)
     ver = modversion(pkg).split(".").collect{|item| item.to_i}
