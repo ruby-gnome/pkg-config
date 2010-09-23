@@ -362,7 +362,7 @@ module PKGConfig
   def have_package(pkg, major = nil, minor = 0, micro = 0)
     message = "#{pkg}"
     unless major.nil?
-      message << "version (>= #{major}.#{minor}.#{micro})"
+      message << " version (>= #{major}.#{minor}.#{micro})"
     end
     major ||= 0
     enough_version = checking_for(checking_message(message)) do
