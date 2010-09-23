@@ -346,15 +346,15 @@ module PKGConfig
   end
 
   def have_package(pkg, major = nil, minor = 0, micro = 0)
-    if major.nil?
-      STDOUT.print("checking for #{pkg}... ")
-    else
-      STDOUT.print("checking for #{pkg} version (>= #{major}.#{minor}.#{micro})... ")
+    message = "#{pkg}"
+    unless major.nil?
+      message << "version (>= #{major}.#{minor}.#{micro})"
     end
     major ||= 0
-    STDOUT.flush
-    if check_version?(pkg, major, minor, micro)
-      STDOUT.print "yes\n"
+    enough_version = checking_for(checking_message(message)) do
+      check_version?(pkg, major, minor, micro)
+    end
+    if enough_version
       libraries = libs_only_l(pkg)
       dldflags = libs(pkg)
       dldflags = (Shellwords.shellwords(dldflags) -
@@ -362,15 +362,12 @@ module PKGConfig
       dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(' ')
       $libs   += ' ' + libraries
       if /mswin32/ =~ RUBY_PLATFORM
-	$DLDFLAGS += ' ' + dldflags
+        $DLDFLAGS += ' ' + dldflags
       else
-	$LDFLAGS += ' ' + dldflags
+        $LDFLAGS += ' ' + dldflags
       end
       $CFLAGS += ' ' + cflags(pkg)
-      true
-    else
-      STDOUT.print "no\n"
-      false
     end
+    enough_version
   end
 end
