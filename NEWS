@@ -1,5 +1,9 @@
 = NEWS
 
+== 1.0.4 - 2010/09/23
+
+* add PKGConfig.variable.
+
 == 1.0.3 - 2010/09/07
 
 * add path and override_variable customize API.
