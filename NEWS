@@ -1,5 +1,9 @@
 = NEWS
 
+== 1.0.6 - 2010/09/23
+
+* add PKGConfig.libs_only_L.
+
 == 1.0.5 - 2010/09/23
 
 * suppress duplicated configure arguments processing.
