@@ -145,6 +145,16 @@ class PackageConfig
     end.join(" ")
   end
 
+  def libs_only_L
+    collect_libs[0].find_all do |arg|
+      if @msvc_syntax
+        /\A\/libpath:/ =~ arg
+      else
+        /\A-L/ =~ arg
+      end
+    end.join(" ")
+  end
+
   def version
     declaration("Version")
   end
@@ -312,6 +322,10 @@ module PKGConfig
 
   def libs_only_l(pkg)
     package_config(pkg).libs_only_l
+  end
+
+  def libs_only_L(pkg)
+    package_config(pkg).libs_only_L
   end
 
   def cflags(pkg)
