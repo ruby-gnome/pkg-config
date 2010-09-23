@@ -123,7 +123,7 @@ class PackageConfig
 
   def cflags
     path_flags, other_flags = collect_cflags
-    (other_flags + path_flags).join(" ")
+    (path_flags + other_flags).join(" ")
   end
 
   def cflags_only_I
@@ -132,7 +132,7 @@ class PackageConfig
 
   def libs
     path_flags, other_flags = collect_libs
-    (other_flags + path_flags).join(" ")
+    (path_flags + other_flags).join(" ")
   end
 
   def libs_only_l
