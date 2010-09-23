@@ -108,6 +108,7 @@ class PkgConfigTest < Test::Unit::TestCase
     else
       args = {"--with-override-variables" => override_variables}
     end
+    PackageConfig.clear_configure_args_cache
     configure_args(args) do
       yield
     end

@@ -24,6 +24,75 @@ require 'pathname'
 class PackageConfig
   SEPARATOR = File::PATH_SEPARATOR
 
+  class << self
+    @native_pkg_config = nil
+    def native_pkg_config
+      return @native_pkg_config if @native_pkg_config
+      pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
+      pkg_config = Pathname.new(pkg_config)
+      unless pkg_config.absolute?
+        found_pkg_config = search_pkg_config_from_path(pkg_config)
+        pkg_config = found_pkg_config if found_pkg_config
+      end
+      unless pkg_config.absolute?
+        found_pkg_config = search_pkg_config_by_dln_find_exe(pkg_config)
+        pkg_config = found_pkg_config if found_pkg_config
+      end
+      @native_pkg_config = pkg_config
+    end
+
+    @custom_override_variables = nil
+    def custom_override_variables
+      @custom_override_variables ||= with_config("override-variables", "")
+    end
+
+    def clear_configure_args_cache
+      @native_pkg_config = nil
+      @custom_override_variables = nil
+    end
+
+    private
+    def search_pkg_config_from_path(pkg_config)
+      (ENV["PATH"] || "").split(SEPARATOR).each do |path|
+        try_pkg_config = Pathname(path) + pkg_config
+        return try_pkg_config if try_pkg_config.exist?
+      end
+      nil
+    end
+
+    def search_pkg_config_by_dln_find_exe(pkg_config)
+      begin
+        require "dl/import"
+      rescue LoadError
+        return nil
+      end
+      dln = Module.new
+      dln.module_eval do
+        if DL.const_defined?(:Importer)
+          extend DL::Importer
+        else
+          extend DL::Importable
+        end
+        begin
+          dlload RbConfig::CONFIG["LIBRUBY"]
+        rescue RuntimeError
+          return nil if $!.message == "unknown error"
+          return nil if /: image not found\z/ =~ $!.message
+          raise
+        rescue DL::DLError
+          return nil
+        end
+        extern "const char *dln_find_exe(const char *, const char *)"
+      end
+      path = dln.dln_find_exe(pkg_config.to_s, nil)
+      if path.size.zero?
+        nil
+      else
+        Pathname(path.to_s)
+      end
+    end
+  end
+
   attr_reader :paths
   attr_accessor :msvc_syntax
   def initialize(name, options={})
@@ -34,7 +103,7 @@ class PackageConfig
     @paths.unshift(@options[:paths] || [])
     @msvc_syntax = @options[:msvc_syntax]
     @variables = @declarations = nil
-    override_variables = with_config("override-variables", "")
+    override_variables = self.class.custom_override_variables
     @override_variables = parse_override_variables(override_variables)
     default_override_variables = @options[:override_variables] || {}
     @override_variables = default_override_variables.merge(@override_variables)
@@ -187,46 +256,6 @@ class PackageConfig
     end
   end
 
-  def search_pkg_config_from_path(pkg_config)
-    (ENV["PATH"] || "").split(SEPARATOR).each do |path|
-      try_pkg_config = Pathname(path) + pkg_config
-      return try_pkg_config if try_pkg_config.exist?
-    end
-    nil
-  end
-
-  def search_pkg_config_by_dln_find_exe(pkg_config)
-    begin
-      require "dl/import"
-    rescue LoadError
-      return nil
-    end
-    dln = Module.new
-    dln.module_eval do
-      if DL.const_defined?(:Importer)
-        extend DL::Importer
-      else
-        extend DL::Importable
-      end
-      begin
-        dlload RbConfig::CONFIG["LIBRUBY"]
-      rescue RuntimeError
-        return nil if $!.message == "unknown error"
-        return nil if /: image not found\z/ =~ $!.message
-        raise
-      rescue DL::DLError
-        return nil
-      end
-      extern "const char *dln_find_exe(const char *, const char *)"
-    end
-    path = dln.dln_find_exe(pkg_config.to_s, nil)
-    if path.size.zero?
-      nil
-    else
-      Pathname(path.to_s)
-    end
-  end
-
   def guess_default_path
     default_path = ["/usr/local/lib64/pkgconfig",
                     "/usr/local/lib/pkgconfig",
@@ -239,17 +268,7 @@ class PackageConfig
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_path = [libdir, default_path].join(SEPARATOR) if libdir
 
-    pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
-    pkg_config = Pathname.new(pkg_config)
-    unless pkg_config.absolute?
-      found_pkg_config = search_pkg_config_from_path(pkg_config)
-      pkg_config = found_pkg_config if found_pkg_config
-    end
-    unless pkg_config.absolute?
-      found_pkg_config = search_pkg_config_by_dln_find_exe(pkg_config)
-      pkg_config = found_pkg_config if found_pkg_config
-    end
-
+    pkg_config = self.class.native_pkg_config
     return default_path unless pkg_config.absolute?
     [(pkg_config.parent.parent + "lib" + "pkgconfig").to_s,
      (pkg_config.parent.parent + "libdata" + "pkgconfig").to_s,
