@@ -27,18 +27,7 @@ class PackageConfig
   class << self
     @native_pkg_config = nil
     def native_pkg_config
-      return @native_pkg_config if @native_pkg_config
-      pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
-      pkg_config = Pathname.new(pkg_config)
-      unless pkg_config.absolute?
-        found_pkg_config = search_pkg_config_from_path(pkg_config)
-        pkg_config = found_pkg_config if found_pkg_config
-      end
-      unless pkg_config.absolute?
-        found_pkg_config = search_pkg_config_by_dln_find_exe(pkg_config)
-        pkg_config = found_pkg_config if found_pkg_config
-      end
-      @native_pkg_config = pkg_config
+      @native_pkg_config ||= guess_native_pkg_config
     end
 
     @custom_override_variables = nil
@@ -52,6 +41,20 @@ class PackageConfig
     end
 
     private
+    def guess_native_pkg_config
+      pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
+      pkg_config = Pathname.new(pkg_config)
+      unless pkg_config.absolute?
+        found_pkg_config = search_pkg_config_from_path(pkg_config)
+        pkg_config = found_pkg_config if found_pkg_config
+      end
+      unless pkg_config.absolute?
+        found_pkg_config = search_pkg_config_by_dln_find_exe(pkg_config)
+        pkg_config = found_pkg_config if found_pkg_config
+      end
+      pkg_config
+    end
+
     def search_pkg_config_from_path(pkg_config)
       (ENV["PATH"] || "").split(SEPARATOR).each do |path|
         try_pkg_config = Pathname(path) + pkg_config
@@ -225,7 +228,7 @@ class PackageConfig
     [path_flags, other_flags]
   end
 
-  IDENTIFIER_RE = /[\w\d_.]+/
+  IDENTIFIER_RE = /[a-zA-Z\d_\.]+/
   def parse_pc
     raise ".pc for #{@name} doesn't exist." unless exist?
     @variables = {}
