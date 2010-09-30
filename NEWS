@@ -1,5 +1,9 @@
 = NEWS
 
+== 1.0.7 - 2010/09/30
+
+* suppress warnings on Ruby 1.9.
+
 == 1.0.6 - 2010/09/23
 
 * add PKGConfig.libs_only_L.
