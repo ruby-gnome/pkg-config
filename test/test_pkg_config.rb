@@ -65,9 +65,9 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_requires_private
-    assert_equal(["freetype2", "fontconfig", "libpng12",
+    assert_equal(["pixman-1", "freetype2", "fontconfig", "libpng12",
                   "xcb", "xcb-render", "xcb-renderutil",
-                  "xrender", "x11", "pixman-1"],
+                  "xrender", "x11"],
                  @cairo.requires_private)
   end
 
