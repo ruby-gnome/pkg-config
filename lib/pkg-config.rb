@@ -186,7 +186,7 @@ class PackageConfig
   end
 
   def collect_cflags
-    all_cflags = (requires_private + requires.reverse).collect do |package|
+    all_cflags = required_packages.collect do |package|
       self.class.new(package, @options).cflags
     end
     all_cflags = [declaration("Cflags")] + all_cflags
@@ -204,7 +204,7 @@ class PackageConfig
   end
 
   def collect_libs
-    all_libs = requires.collect do |package|
+    all_libs = required_packages.collect do |package|
       self.class.new(package, @options).libs
     end
     all_libs = [declaration("Libs")] + all_libs
@@ -286,6 +286,12 @@ class PackageConfig
     [(pkg_config.parent.parent + "lib" + "pkgconfig").to_s,
      (pkg_config.parent.parent + "libdata" + "pkgconfig").to_s,
      default_path].join(SEPARATOR)
+  end
+
+  def required_packages
+    (requires_private + requires.reverse).reject do |package|
+      @name == package
+    end.uniq
   end
 end
 
