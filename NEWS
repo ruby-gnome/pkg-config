@@ -1,5 +1,9 @@
 = NEWS
 
+== 1.0.8 - 2011/01/30
+
+* fix a bug that multiple PKGConfig.add_path doesn't work.
+
 == 1.0.7 - 2010/09/30
 
 * suppress warnings on Ruby 1.9.
