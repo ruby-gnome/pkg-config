@@ -296,7 +296,7 @@ class PackageConfig
 end
 
 module PKGConfig
-  VERSION = "1.0.8"
+  VERSION = "1.0.9"
 
   @@paths = []
   @@override_variables = {}
