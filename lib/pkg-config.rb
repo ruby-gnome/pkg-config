@@ -277,6 +277,7 @@ class PackageConfig
                     "/usr/lib/pkgconfig",
                     "/usr/lib64/pkgconfig",
                     "/usr/lib/x86_64-linux-gnu/pkgconfig",
+                    "/usr/lib/i386-linux-gnu/pkgconfig",
                     "/usr/X11/lib/pkgconfig/",
                     "/usr/share/pkgconfig"].join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
