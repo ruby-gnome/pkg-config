@@ -65,8 +65,8 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_requires_private
-    expected_requires = `pkg-config --print-requires-private cairo`.split(/\n/)
-    expected_requires = expected_requires.collect do |require|
+    requires_private = pkg_config("cairo", "--print-requires-private")
+    expected_requires = requires_private.split(/\n/).collect do |require|
       require.split(/\s/, 2)[0]
     end
     assert_equal(expected_requires,
