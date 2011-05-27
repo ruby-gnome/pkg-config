@@ -65,9 +65,11 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_requires_private
-    assert_equal(["pixman-1", "freetype2", "fontconfig", "libpng12",
-                  "xcb", "xcb-render", "xcb-renderutil",
-                  "xrender", "x11"],
+    expected_requires = `pkg-config --print-requires-private cairo`.split(/\n/)
+    expected_requires = expected_requires.collect do |require|
+      require.split(/\s/, 2)[0]
+    end
+    assert_equal(expected_requires,
                  @cairo.requires_private)
   end
 
