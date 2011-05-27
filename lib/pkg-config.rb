@@ -1,4 +1,4 @@
-# Copyright 2008-2010 Kouhei Sutou <kou@cozmixng.org>
+# Copyright 2008-2011 Kouhei Sutou <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -186,7 +186,7 @@ class PackageConfig
   end
 
   def collect_cflags
-    all_cflags = required_packages.collect do |package|
+    all_cflags = all_required_packages.collect do |package|
       self.class.new(package, @options).cflags
     end
     all_cflags = [declaration("Cflags")] + all_cflags
@@ -291,6 +291,12 @@ class PackageConfig
   end
 
   def required_packages
+    requires.reject do |package|
+      @name == package
+    end.uniq
+  end
+
+  def all_required_packages
     (requires_private + requires.reverse).reject do |package|
       @name == package
     end.uniq
