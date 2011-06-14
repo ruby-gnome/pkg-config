@@ -20,8 +20,7 @@ A pkg-config implementation by Ruby.
 
 === No package
 
-  % ruby extconf.rb
-  # make install
+  # ruby setup.rb
 
 == Documents
 
