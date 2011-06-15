@@ -38,7 +38,7 @@ project = Hoe.spec('pkg-config') do |project|
   project.author = "Kouhei Sutou"
   project.readme_file = "README.rdoc"
   project.email = ['kou@cozmixng.org']
-  project.summary = 'A pkg-config implmenetation by Ruby'
+  project.summary = 'A pkg-config wrapper for Ruby'
   project.url = 'http://github.com/rcairo/pkg-config'
   project.spec_extras = {
     :require_paths => ['lib'],
@@ -46,7 +46,7 @@ project = Hoe.spec('pkg-config') do |project|
   }
   news = base_dir + "NEWS"
   project.changes = news.read.split(/^== .*$/)[1].strip
-  project.description = "A pkg-cofnig implementation by Ruby"
+  project.description = "pkg-config can be used in your extconf.rb to properly detect neeed libraries for compiling Ruby native extensions"
 end
 
 desc "tag the current veresion"
