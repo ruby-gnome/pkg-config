@@ -31,9 +31,7 @@ A pkg-config implementation by Ruby.
 There is the pkg-config repository at GitHub:
 http://github.com/rcairo/pkg-config
 
-== License
-
-LGPLv2+. See LGPL-2.1 file for details.
+== Copyright
 
 Copyright 2008-2011 Kouhei Sutou <kou@clear-code.com>
 
@@ -50,6 +48,8 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+See LGPL-2.1 file for details.
 
 == Mailing list
 
