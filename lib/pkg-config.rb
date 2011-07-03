@@ -376,7 +376,7 @@ module PKGConfig
 
   def check_version?(pkg, major = 0, minor = 0, micro = 0)
     return false unless exist?(pkg)
-    ver = modversion(pkg).split(".").collect{|item| item.to_i}
+    ver = modversion(pkg).split(".").collect {|item| item.to_i}
     (0..2).each {|i| ver[i] = 0 unless ver[i]}
 
     (ver[0] > major ||
