@@ -104,6 +104,7 @@ class PackageConfig
     path = @options[:path] || ENV["PKG_CONFIG_PATH"]
     @paths = [path, guess_default_path].compact.join(SEPARATOR).split(SEPARATOR)
     @paths.unshift(*(@options[:paths] || []))
+    @paths = normalize_paths(@paths)
     @msvc_syntax = @options[:msvc_syntax]
     @variables = @declarations = nil
     override_variables = self.class.custom_override_variables
@@ -270,14 +271,14 @@ class PackageConfig
   end
 
   def guess_default_path
+    arch_depended_path = Dir.glob('/usr/lib/*/pkgconfig').join(SEPARATOR)
     default_path = ["/usr/local/lib64/pkgconfig",
                     "/usr/local/lib/pkgconfig",
                     "/usr/local/libdata/pkgconfig",
                     "/opt/local/lib/pkgconfig",
                     "/usr/lib64/pkgconfig",
                     "/usr/lib/pkgconfig",
-                    "/usr/lib/x86_64-linux-gnu/pkgconfig",
-                    "/usr/lib/i386-linux-gnu/pkgconfig",
+                    arch_depended_path,
                     "/usr/X11/lib/pkgconfig/",
                     "/usr/share/pkgconfig"].join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
@@ -285,8 +286,10 @@ class PackageConfig
 
     pkg_config = self.class.native_pkg_config
     return default_path unless pkg_config.absolute?
-    [(pkg_config.parent.parent + "lib" + "pkgconfig").to_s,
-     (pkg_config.parent.parent + "libdata" + "pkgconfig").to_s,
+    pkg_config_prefix = pkg_config.parent.parent
+    [(pkg_config_prefix + "lib64" + "pkgconfig").to_s,
+     (pkg_config_prefix + "lib" + "pkgconfig").to_s,
+     (pkg_config_prefix + "libdata" + "pkgconfig").to_s,
      default_path].join(SEPARATOR)
   end
 
@@ -300,6 +303,12 @@ class PackageConfig
     (requires_private + requires.reverse).reject do |package|
       @name == package
     end.uniq
+  end
+
+  def normalize_paths(paths)
+    paths.reject do |path|
+      path.empty? or !File.exist?(path)
+    end
   end
 end
 
