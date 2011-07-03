@@ -276,9 +276,9 @@ class PackageConfig
                     "/usr/local/lib/pkgconfig",
                     "/usr/local/libdata/pkgconfig",
                     "/opt/local/lib/pkgconfig",
+                    arch_depended_path,
                     "/usr/lib64/pkgconfig",
                     "/usr/lib/pkgconfig",
-                    arch_depended_path,
                     "/usr/X11/lib/pkgconfig/",
                     "/usr/share/pkgconfig"].join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
