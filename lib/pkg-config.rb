@@ -183,7 +183,7 @@ class PackageConfig
       pc_name = File.join(path, "#{@name}.pc")
       return pc_name if File.exist?(pc_name)
     end
-    return nil
+    nil
   end
 
   def collect_cflags
