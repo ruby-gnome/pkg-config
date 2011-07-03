@@ -374,7 +374,7 @@ module PKGConfig
     package_config(pkg).variable(name)
   end
 
-  def check_version?(pkg, major = 0, minor = 0, micro = 0)
+  def check_version?(pkg, major=0, minor=0, micro=0)
     return false unless exist?(pkg)
     ver = modversion(pkg).split(".").collect {|item| item.to_i}
     (0..2).each {|i| ver[i] = 0 unless ver[i]}
@@ -385,7 +385,7 @@ module PKGConfig
       ver[2] >= micro))
   end
 
-  def have_package(pkg, major = nil, minor = 0, micro = 0)
+  def have_package(pkg, major=nil, minor=0, micro=0)
     message = "#{pkg}"
     unless major.nil?
       message << " version (>= #{major}.#{minor}.#{micro})"
