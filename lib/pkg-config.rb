@@ -287,9 +287,12 @@ class PackageConfig
     pkg_config = self.class.native_pkg_config
     return default_path unless pkg_config.absolute?
     pkg_config_prefix = pkg_config.parent.parent
-    [(pkg_config_prefix + "lib64" + "pkgconfig").to_s,
-     (pkg_config_prefix + "lib" + "pkgconfig").to_s,
-     (pkg_config_prefix + "libdata" + "pkgconfig").to_s,
+    pkg_config_arch_depended_path =
+      Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s).join(SEPARATOR)
+    [pkg_config_arch_depended_path,
+     (pkg_config_prefix + "lib64/pkgconfig").to_s,
+     (pkg_config_prefix + "lib/pkgconfig").to_s,
+     (pkg_config_prefix + "libdata/pkgconfig").to_s,
      default_path].join(SEPARATOR)
   end
 
