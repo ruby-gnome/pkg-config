@@ -114,7 +114,7 @@ class PackageConfig
   end
 
   def exist?
-    not pc.nil?
+    not pc_path.nil?
   end
 
   def requires
@@ -177,15 +177,15 @@ class PackageConfig
     expand_value(@declarations[name])
   end
 
-  private
-  def pc
+  def pc_path
     @paths.each do |path|
-      pc_name = File.join(path, "#{@name}.pc")
-      return pc_name if File.exist?(pc_name)
+      _pc_path = File.join(path, "#{@name}.pc")
+      return _pc_path if File.exist?(_pc_path)
     end
     nil
   end
 
+  private
   def collect_cflags
     all_cflags = all_required_packages.collect do |package|
       self.class.new(package, @options).cflags
@@ -234,7 +234,7 @@ class PackageConfig
     raise ".pc for #{@name} doesn't exist." unless exist?
     @variables = {}
     @declarations = {}
-    File.open(pc) do |input|
+    File.open(pc_path) do |input|
       input.each_line do |line|
         line = line.gsub(/#.*/, '').strip
         next if line.empty?
