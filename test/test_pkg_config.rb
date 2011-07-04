@@ -17,13 +17,11 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_cflags
-    omit("this is known bug in 1.1.2") if PKGConfig::VERSION == "1.1.2"
     assert_pkg_config("cairo", ["--cflags"], @cairo.cflags)
     assert_pkg_config("cairo-png", ["--cflags"], @cairo_png.cflags)
   end
 
   def test_cflags_only_I
-    omit("this is known bug in 1.1.2") if PKGConfig::VERSION == "1.1.2"
     assert_pkg_config("cairo", ["--cflags-only-I"], @cairo.cflags_only_I)
     assert_pkg_config("cairo-png", ["--cflags-only-I"], @cairo_png.cflags_only_I)
   end
