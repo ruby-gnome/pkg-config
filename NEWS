@@ -1,5 +1,23 @@
 = NEWS
 
+== 1.1.2 - 2011/07/04
+
+  * [GitHub #2] fix test broken.
+    (Reported by Mamoru Tasaka.)
+  * [GitHub #4] update project descripton.
+    (Patch by Antonio Terceiro.)
+  * [GitHub #4] use setup.rb instead of extconf.rb.
+    (Patch by Antonio Terceiro.)
+  * [GitHub #3] add Copyright notice to README.
+    (Suggested by Antonio Terceiro.)
+  * [GitHub #7] supported non i386 and amd64 architectures.
+    (Reported by Antonio Terceiro.)
+
+=== Thanks
+
+  * Mamoru Tasaka
+  * Antonio Terceiro
+
 == 1.1.1 - 2011/05/03
 
 * [ruby-gnome-devel-en] add
