@@ -3,12 +3,10 @@
 $VERBOSE = true
 
 base_dir = File.expand_path(File.join(File.dirname(__FILE__), ".."))
-test_unit_dir = File.join(base_dir, "test-unit", "lib")
 lib_dir = File.join(base_dir, "lib")
 test_dir = File.join(base_dir, "test")
 
-$LOAD_PATH.unshift(test_unit_dir)
-
+gem 'test-unit'
 require 'test/unit'
 
 $LOAD_PATH.unshift(base_dir)

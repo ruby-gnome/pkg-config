@@ -1,4 +1,3 @@
 /pkg/
 /doc/
-/Makefile
-/test-unit/
+/Gemfile.lock

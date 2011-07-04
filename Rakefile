@@ -1,6 +1,6 @@
 # -*- coding: utf-8; mode: ruby -*-
 #
-# Copyright (C) 20010-2011  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2010-2011  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@ require 'English'
 require 'pathname'
 require 'fileutils'
 require 'rubygems'
-require 'hoe'
+require 'jeweler'
 
 base_dir = Pathname(__FILE__).dirname
 lib_dir = base_dir + "lib"
@@ -33,22 +33,25 @@ def guess_version
 end
 
 ENV["VERSION"] ||= guess_version
-version = ENV["VERSION"]
-project = Hoe.spec('pkg-config') do |project|
-  project.version = version
-  project.rubyforge_name = 'cairo'
-  project.author = "Kouhei Sutou"
-  project.readme_file = "README.rdoc"
-  project.email = ['kou@cozmixng.org']
-  project.summary = 'A pkg-config implementation for Ruby'
-  project.url = 'http://github.com/rcairo/pkg-config'
-  project.spec_extras = {
-    :require_paths => ['lib'],
-    :has_rdoc => false,
-  }
-  news = base_dir + "NEWS"
-  project.changes = news.read.split(/^== .*$/)[1].strip
-  project.description = "pkg-config can be used in your extconf.rb to properly detect neeed libraries for compiling Ruby native extensions"
+version = ENV["VERSION"].dup
+spec = nil
+Jeweler::Tasks.new do |_spec|
+  spec = _spec
+  spec.name = "pkg-config"
+  spec.version = version
+  spec.rubyforge_project = 'cairo'
+  spec.author = "Kouhei Sutou"
+  spec.email = ['kou@cozmixng.org']
+  spec.summary = 'A pkg-config implementation for Ruby'
+  spec.homepage = 'http://github.com/rcairo/pkg-config'
+  spec.description = "pkg-config can be used in your extconf.rb to properly detect need libraries for compiling Ruby native extensions"
+  spec.license = "LGPLv2+"
+  spec.files = FileList["lib/**/*.rb",
+                        "*.rb",
+                        "Gemfile",
+                        "Rakefile",
+                        "LGPL-2.1"]
+  spec.test_files = FileList["test/**/*.rb"]
 end
 
 desc "tag the current veresion"
