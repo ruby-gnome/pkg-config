@@ -54,6 +54,9 @@ Jeweler::Tasks.new do |_spec|
   spec.test_files = FileList["test/**/*.rb"]
 end
 
+Jeweler::RubygemsDotOrgTasks.new do
+end
+
 desc "tag the current veresion"
 task :tag do
   sh("git", "tag", "-a", version.to_s, "-m", "release #{version}!!!")
