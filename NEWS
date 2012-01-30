@@ -1,5 +1,15 @@
 = NEWS
 
+== 1.1.3 - 2012/01/29
+
+  * [GitHub #8] fix test broken by libpng version.
+    (Patch by Bohuslav Kabrda.)
+  * Used RbConfig instead of Config.
+
+=== Thanks
+
+  * Bohuslav Kabrda
+
 == 1.1.2 - 2011/07/04
 
   * [GitHub #2] fix test broken.
