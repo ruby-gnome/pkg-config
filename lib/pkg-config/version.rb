@@ -15,5 +15,5 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module PKGConfig
-  VERSION = "1.1.4"
+  VERSION = "1.1.5"
 end
