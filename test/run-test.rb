@@ -6,12 +6,12 @@ base_dir = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 lib_dir = File.join(base_dir, "lib")
 test_dir = File.join(base_dir, "test")
 
-gem 'test-unit'
-require 'test/unit'
+ENV["BUNDLE_GEMFILE"] ||= File.join(base_dir, "Gemfile")
+require "bundler/setup"
 
-$LOAD_PATH.unshift(base_dir)
+require 'test-unit'
+
 $LOAD_PATH.unshift(lib_dir)
-
 $LOAD_PATH.unshift(test_dir)
 
 Dir.glob("test/**/test_*.rb") do |file|
