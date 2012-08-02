@@ -1,6 +1,4 @@
-# -*- coding: utf-8; mode: ruby -*-
-#
-# Copyright (C) 2010-2012  Kouhei Sutou <kou@clear-code.com>
+# Copyright 2012 Kouhei Sutou <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,15 +14,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "rubygems"
-require "bundler/gem_helper"
-
-base_dir = File.dirname(__FILE__)
-
-helper = Bundler::GemHelper.new(base_dir)
-def helper.version_tag
-  version
+module PKGConfig
+  VERSION = "1.1.4"
 end
-
-helper.install
-spec = helper.gemspec
