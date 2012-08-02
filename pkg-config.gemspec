@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.description = "pkg-config can be used in your extconf.rb to properly detect need libraries for compiling Ruby native extensions"
   spec.license = "LGPLv2+"
   spec.files = ["README.rdoc", "NEWS", "Gemfile", "Rakefile", "LGPL-2.1"]
-  spec.files += Dir.glob("lib/**/*.rb"),
+  spec.files += Dir.glob("lib/**/*.rb")
   spec.test_files = Dir.glob("test/**/*.rb")
 
   spec.add_development_dependency("test-unit")
