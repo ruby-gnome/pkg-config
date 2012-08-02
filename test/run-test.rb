@@ -15,7 +15,7 @@ $LOAD_PATH.unshift(lib_dir)
 $LOAD_PATH.unshift(test_dir)
 
 Dir.glob("test/**/test_*.rb") do |file|
-  require file.sub(/\.rb$/, '')
+  require file.gsub(/(?:^test\/|\.rb$)/, '')
 end
 
 exit Test::Unit::AutoRunner.run(false)
