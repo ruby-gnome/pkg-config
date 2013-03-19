@@ -407,7 +407,7 @@ module PKGConfig
                   Shellwords.shellwords(libraries))
       dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(' ')
       $libs   += ' ' + libraries
-      if /mswin32/ =~ RUBY_PLATFORM
+      if /mswin/ =~ RUBY_PLATFORM
         $DLDFLAGS += ' ' + dldflags
       else
         $LDFLAGS += ' ' + dldflags
