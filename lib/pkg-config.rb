@@ -285,6 +285,7 @@ class PackageConfig
                     "/usr/lib64/pkgconfig",
                     "/usr/lib/pkgconfig",
                     "/usr/X11/lib/pkgconfig/",
+                    "/opt/X11/lib/pkgconfig/",
                     "/usr/share/pkgconfig"].join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_path = [libdir, default_path].join(SEPARATOR) if libdir
