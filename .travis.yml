@@ -7,4 +7,4 @@ rvm:
   - ruby-head
 notifications:
   recipients:
-    - kou@cozmixng.org
+    - ruby-gnome2-cvs@lists.sourceforge.net
