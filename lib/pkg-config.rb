@@ -1,4 +1,4 @@
-# Copyright 2008-2011 Kouhei Sutou <kou@cozmixng.org>
+# Copyright 2008-2013 Kouhei Sutou <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -192,12 +192,13 @@ class PackageConfig
 
   private
   def collect_cflags
-    all_cflags = all_required_packages.collect do |package|
+    cflags_set = [declaration("Cflags")]
+    cflags_set += all_required_packages.collect do |package|
       self.class.new(package, @options).cflags
     end
-    all_cflags = [declaration("Cflags")] + all_cflags
-    all_cflags = all_cflags.join(" ").gsub(/-I /, '-I').split.uniq
+    all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
     path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
+    path_flags = remove_duplicated_include_paths(path_flags)
     path_flags = path_flags.reject do |flag|
       flag == "-I/usr/include"
     end
@@ -207,6 +208,27 @@ class PackageConfig
       end
     end
     [path_flags, other_flags]
+  end
+
+  def normalize_cflags(cflags)
+    normalized_cflags = []
+    enumerator = cflags.to_enum
+    begin
+      loop do
+        cflag = enumerator.next
+        normalized_cflags << cflag
+        case cflag
+        when "-I"
+          normalized_cflags << enumerator.next
+        end
+      end
+    rescue StopIteration
+    end
+    normalized_cflags
+  end
+
+  def remove_duplicated_include_paths(path_flags)
+    path_flags.uniq
   end
 
   def collect_libs
