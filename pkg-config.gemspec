@@ -34,7 +34,6 @@ Gem::Specification.new do |spec|
   spec.test_files = Dir.glob("test/**/*.rb")
 
   spec.add_development_dependency("test-unit")
-  spec.add_development_dependency("test-unit-notify")
   spec.add_development_dependency("rake")
   spec.add_development_dependency("bundler")
 end
