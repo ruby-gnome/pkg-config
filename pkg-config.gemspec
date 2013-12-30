@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.name = "pkg-config"
   spec.version = PKGConfig::VERSION
   spec.rubyforge_project = "cairo"
-  spec.homepage = "https://github.com/rcairo/pkg-config"
+  spec.homepage = "https://github.com/ruby-gnome2/pkg-config"
   spec.authors = ["Kouhei Sutou"]
   spec.email = ["kou@cozmixng.org"]
   spec.summary = 'A pkg-config implementation for Ruby'
