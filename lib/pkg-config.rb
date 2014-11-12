@@ -90,7 +90,11 @@ class PackageConfig
         rescue DL::DLError
           return nil
         end
-        extern "const char *dln_find_exe(const char *, const char *)"
+        begin
+          extern "const char *dln_find_exe(const char *, const char *)"
+        rescue DL::DLError
+          return nil
+        end
       end
       path = dln.dln_find_exe(pkg_config.to_s, nil)
       if path.nil? or path.size.zero?
