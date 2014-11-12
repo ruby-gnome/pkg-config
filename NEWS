@@ -1,5 +1,14 @@
 = NEWS
 
+== 1.1.5 - 2013/12/29
+
+  * Supported XQuartz.
+    [GitHub:#10][Patch by Masafumi Yokoyama]
+
+=== Thanks
+
+  * Masafumi Yokoyama
+
 == 1.1.4 - 2012/08/02
 
   * Supported mswin64 as MSVC environment.
