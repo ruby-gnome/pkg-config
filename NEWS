@@ -1,5 +1,14 @@
 = NEWS
 
+== 1.1.6 - 2014/11/12
+
+  * Supported Ruby 2.1.
+    [GitHub:ruby-gnome2/ruby-gnome2#262][Reported by Steve Wills]
+
+=== Thanks
+
+  * Steve Wills
+
 == 1.1.5 - 2013/12/29
 
   * Supported XQuartz.
