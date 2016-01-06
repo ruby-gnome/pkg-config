@@ -312,8 +312,8 @@ class PackageConfig
       "/usr/lib64/pkgconfig",
       "/usr/lib/pkgconfig",
       "/usr/libdata/pkgconfig",
-      "/usr/X11/lib/pkgconfig/",
-      "/opt/X11/lib/pkgconfig/",
+      "/usr/X11/lib/pkgconfig",
+      "/opt/X11/lib/pkgconfig",
       "/usr/share/pkgconfig",
     ]
     default_path = default_paths.join(SEPARATOR)
