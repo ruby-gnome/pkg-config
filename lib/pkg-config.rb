@@ -339,7 +339,7 @@ class PackageConfig
   end
 
   def all_required_packages
-    (requires_private + requires.reverse).reject do |package|
+    (requires_private + requires).reject do |package|
       @name == package
     end.uniq
   end
