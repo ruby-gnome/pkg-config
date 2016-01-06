@@ -303,17 +303,20 @@ class PackageConfig
 
   def guess_default_path
     arch_depended_path = Dir.glob('/usr/lib/*/pkgconfig').join(SEPARATOR)
-    default_path = ["/usr/local/lib64/pkgconfig",
-                    "/usr/local/lib/pkgconfig",
-                    "/usr/local/libdata/pkgconfig",
-                    "/opt/local/lib/pkgconfig",
-                    arch_depended_path,
-                    "/usr/lib64/pkgconfig",
-                    "/usr/lib/pkgconfig",
-                    "/usr/libdata/pkgconfig",
-                    "/usr/X11/lib/pkgconfig/",
-                    "/opt/X11/lib/pkgconfig/",
-                    "/usr/share/pkgconfig"].join(SEPARATOR)
+    default_paths = [
+      "/usr/local/lib64/pkgconfig",
+      "/usr/local/lib/pkgconfig",
+      "/usr/local/libdata/pkgconfig",
+      "/opt/local/lib/pkgconfig",
+      arch_depended_path,
+      "/usr/lib64/pkgconfig",
+      "/usr/lib/pkgconfig",
+      "/usr/libdata/pkgconfig",
+      "/usr/X11/lib/pkgconfig/",
+      "/opt/X11/lib/pkgconfig/",
+      "/usr/share/pkgconfig",
+    ]
+    default_path = default_paths.join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_path = [libdir, default_path].join(SEPARATOR) if libdir
 
