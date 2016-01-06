@@ -1,5 +1,14 @@
 = NEWS
 
+== 1.1.7 - 2015-01-16
+
+  * Added path for FreeBSD to default paths.
+    [Reported by Hajime UMEMOTO]
+
+=== Thanks
+
+  * Hajime UMEMOTO
+
 == 1.1.6 - 2014/11/12
 
   * Supported Ruby 2.1.
