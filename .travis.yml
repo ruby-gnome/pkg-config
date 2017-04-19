@@ -1,9 +1,9 @@
 rvm:
-  - 1.9.3
-  - 2.0.0
   - 2.1
   - 2.2
-  - ruby-head
+  - 2.3
+  - 2.4.2
 notifications:
-  recipients:
-    - ruby-gnome2-cvs@lists.sourceforge.net
+  email:
+    recipients:
+      - ruby-gnome2-cvs@lists.sourceforge.net
