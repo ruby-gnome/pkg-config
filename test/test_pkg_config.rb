@@ -1,4 +1,5 @@
-require 'pkg-config'
+require "mkmf"
+require "pkg-config"
 
 class PkgConfigTest < Test::Unit::TestCase
   def setup
