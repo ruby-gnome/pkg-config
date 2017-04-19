@@ -1,4 +1,4 @@
-# Copyright 2008-2016 Kouhei Sutou <kou@cozmixng.org>
+# Copyright 2008-2017 Kouhei Sutou <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@ end
 
 require "rbconfig"
 
-require 'mkmf'
 require 'shellwords'
 require 'English'
 require 'pathname'
@@ -46,6 +45,14 @@ class PackageConfig
     end
 
     private
+    def with_config(config, default=nil)
+      if defined?(super)
+        super
+      else
+        default
+      end
+    end
+
     def guess_native_pkg_config
       pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
       pkg_config = Pathname.new(pkg_config)
