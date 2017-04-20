@@ -150,6 +150,10 @@ class PackageConfig
     collect_cflags[0].join(" ")
   end
 
+  def cflags_only_other
+    collect_cflags[1].join(" ")
+  end
+
   def libs
     path_flags, other_flags = collect_libs
     (path_flags + other_flags).join(" ")
@@ -406,6 +410,10 @@ module PKGConfig
     package_config(pkg).cflags_only_I
   end
 
+  def cflags_only_other(pkg)
+    package_config(pkg).cflags_only_other
+  end
+
   def modversion(pkg)
     package_config(pkg).version
   end
@@ -450,7 +458,9 @@ module PKGConfig
       else
         $LDFLAGS += ' ' + dldflags
       end
-      $CFLAGS += ' ' + cflags(pkg)
+      $CFLAGS += ' ' + cflags_only_other(pkg)
+      $CXXFLAGS += ' ' + cflags_only_other(pkg)
+      $INCFLAGS += ' ' + cflags_only_I(pkg)
     end
     enough_version
   end
