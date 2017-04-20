@@ -1,5 +1,9 @@
 = NEWS
 
+== 1.1.9 - 2017-04-20
+
+  * Supported C++ compiler.
+
 == 1.1.8 - 2017-04-19
 
   * Stopped to require mkmf.
