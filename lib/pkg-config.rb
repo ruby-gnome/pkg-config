@@ -254,7 +254,7 @@ class PackageConfig
     all_libs = all_libs.join(" ").gsub(/-([Ll]) /, '\1').split.uniq
     path_flags, other_flags = all_libs.partition {|flag| /\A-L/ =~ flag}
     path_flags = path_flags.reject do |flag|
-      /\A-L\/usr\/lib(?:64)?\z/ =~ flag
+      /\A-L\/usr\/lib(?:64|x32)?\z/ =~ flag
     end
     if @msvc_syntax
       path_flags = path_flags.collect do |flag|
@@ -316,11 +316,13 @@ class PackageConfig
     arch_depended_path = Dir.glob('/usr/lib/*/pkgconfig').join(SEPARATOR)
     default_paths = [
       "/usr/local/lib64/pkgconfig",
+      "/usr/local/libx32/pkgconfig",
       "/usr/local/lib/pkgconfig",
       "/usr/local/libdata/pkgconfig",
       "/opt/local/lib/pkgconfig",
       arch_depended_path,
       "/usr/lib64/pkgconfig",
+      "/usr/libx32/pkgconfig",
       "/usr/lib/pkgconfig",
       "/usr/libdata/pkgconfig",
       "/usr/X11/lib/pkgconfig",
@@ -338,6 +340,7 @@ class PackageConfig
       Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s).join(SEPARATOR)
     [pkg_config_arch_depended_path,
      (pkg_config_prefix + "lib64/pkgconfig").to_s,
+     (pkg_config_prefix + "libx32/pkgconfig").to_s,
      (pkg_config_prefix + "lib/pkgconfig").to_s,
      (pkg_config_prefix + "libdata/pkgconfig").to_s,
      default_path].join(SEPARATOR)
