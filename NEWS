@@ -1,5 +1,15 @@
 = NEWS
 
+== 1.2.0 - 2017-04-25
+
+=== Improvements
+
+  * Supported x32 environment. [GitHub#12][Reported by Elan Ruusamäe]
+
+=== Thanks
+
+  * Elan Ruusamäe
+
 == 1.1.9 - 2017-04-20
 
   * Supported C++ compiler.
