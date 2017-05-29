@@ -1,5 +1,11 @@
 = NEWS
 
+== 1.2.1 - 2017-05-29
+
+=== Improvements
+
+  * Supported MSYS2.
+
 == 1.2.0 - 2017-04-25
 
 === Improvements
