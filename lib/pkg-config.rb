@@ -313,14 +313,14 @@ class PackageConfig
   end
 
   def guess_default_path
-    arch_depended_path = Dir.glob('/usr/lib/*/pkgconfig').join(SEPARATOR)
+    arch_depended_path = Dir.glob("/usr/lib/*/pkgconfig")
     default_paths = [
       "/usr/local/lib64/pkgconfig",
       "/usr/local/libx32/pkgconfig",
       "/usr/local/lib/pkgconfig",
       "/usr/local/libdata/pkgconfig",
       "/opt/local/lib/pkgconfig",
-      arch_depended_path,
+      *arch_depended_path,
       "/usr/lib64/pkgconfig",
       "/usr/libx32/pkgconfig",
       "/usr/lib/pkgconfig",
