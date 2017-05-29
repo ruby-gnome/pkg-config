@@ -226,20 +226,21 @@ class PackageConfig
     [path_flags, other_flags]
   end
 
-  def normalize_path_flags(path_flags, prefix)
+  def normalize_path_flags(path_flags, flag_option)
     path_flags.collect do |path_flag|
-      path = path_flag.sub(prefix, "")
+      path = path_flag.sub(flag_option, "")
+      prefix = ""
       case RUBY_PLATFORM
       when "x86-mingw32"
-        unless /\A[a-z]:/i === path
-          path = Dir.glob("c:/msys{32,64,*}").first + path
-        end
+        prefix = Dir.glob("c:/msys{32,64,*}").first
       when "x64-mingw32"
-        unless /\A[a-z]:/i === path
-          path = Dir.glob("c:/msys{64,*}").first + path
-        end
+        prefix = Dir.glob("c:/msys{64,*}").first
       end
-      "#{prefix}#{path}"
+      if /\A[a-z]:/i === path
+        "#{flag_option}#{path}"
+      else
+        "#{flag_option}#{prefix}#{path}"
+      end
     end
   end
 
