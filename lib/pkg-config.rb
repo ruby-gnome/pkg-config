@@ -231,9 +231,13 @@ class PackageConfig
       path = path_flag.sub(prefix, "")
       case RUBY_PLATFORM
       when "x86-mingw32"
-        path = Dir.glob("c:/msys{32,64,*}").first + path
+        unless /\A[a-z]:/i === path
+          path = Dir.glob("c:/msys{32,64,*}").first + path
+        end
       when "x64-mingw32"
-        path = Dir.glob("c:/msys{64,*}").first + path
+        unless /\A[a-z]:/i === path
+          path = Dir.glob("c:/msys{64,*}").first + path
+        end
       end
       "#{prefix}#{path}"
     end
