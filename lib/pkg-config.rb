@@ -213,6 +213,7 @@ class PackageConfig
     end
     all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
     path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
+    path_flags = normalize_path_flags(path_flags, "-I")
     path_flags = remove_duplicated_include_paths(path_flags)
     path_flags = path_flags.reject do |flag|
       flag == "-I/usr/include"
@@ -223,6 +224,19 @@ class PackageConfig
       end
     end
     [path_flags, other_flags]
+  end
+
+  def normalize_path_flags(path_flags, prefix)
+    path_flags.collect do |path_flag|
+      path = path_flag.sub(prefix, "")
+      case RUBY_PLATFORM
+      when "x86-mingw32"
+        path = Dir.glob("c:/msys{32,64,*}").first + path
+      when "x64-mingw32"
+        path = Dir.glob("c:/msys{64,*}").first + path
+      end
+      "#{prefix}#{path}"
+    end
   end
 
   def normalize_cflags(cflags)
@@ -253,6 +267,7 @@ class PackageConfig
     all_libs = [declaration("Libs")] + all_libs
     all_libs = all_libs.join(" ").gsub(/-([Ll]) /, '\1').split.uniq
     path_flags, other_flags = all_libs.partition {|flag| /\A-L/ =~ flag}
+    path_flags = normalize_path_flags(path_flags, "-L")
     path_flags = path_flags.reject do |flag|
       /\A-L\/usr\/lib(?:64|x32)?\z/ =~ flag
     end
