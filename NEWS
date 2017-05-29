@@ -1,5 +1,11 @@
 = NEWS
 
+== 1.2.2 - 2017-05-29
+
+=== Improvements
+
+  * Supported path normalization for MSYS2.
+
 == 1.2.1 - 2017-05-29
 
 === Improvements
