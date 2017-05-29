@@ -329,6 +329,12 @@ class PackageConfig
       "/opt/X11/lib/pkgconfig",
       "/usr/share/pkgconfig",
     ]
+    case RUBY_PLATFORM
+    when "x86-mingw32"
+      default_paths.concat(Dir.glob("c:/msys*/mingw32/lib/pkgconfig"))
+    when "x64-mingw32"
+      default_paths.concat(Dir.glob("c:/msys*/mingw64/lib/pkgconfig"))
+    end
     default_path = default_paths.join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_path = [libdir, default_path].join(SEPARATOR) if libdir
