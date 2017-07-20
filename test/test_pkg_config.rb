@@ -12,7 +12,7 @@ class PkgConfigTest < Test::Unit::TestCase
   def only_pkg_config_version(major, minor)
     pkg_config_version = `pkg-config --version`.chomp
     current_major, current_minor = pkg_config_version.split(".").collect(&:to_i)
-    return if ([major, minor] <=> [current_major, current_minor]) >= 0
+    return if ([major, minor] <=> [current_major, current_minor]) < 0
     omit("Require pkg-config #{pkg_config_version} or later")
   end
 
