@@ -110,7 +110,12 @@ class PkgConfigTest < Test::Unit::TestCase
   def assert_pkg_config(package, pkg_config_args, actual)
     result = pkg_config(package, *pkg_config_args)
     result = nil if result.empty?
-    assert_equal(result, actual)
+    begin
+      assert_equal(result, actual)
+    rescue Exception
+      puts "Did not match, retry with sorting"
+      assert_equal(result.gsub(/"/,"").split(" ").sort.uniq.join(" "), actual.gsub(/"/,"").split(" ").sort.uniq.join(" "))
+    end
   end
 
   def assert_override_variables(expected, override_variables)
