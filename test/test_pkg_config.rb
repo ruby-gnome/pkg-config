@@ -9,6 +9,13 @@ class PkgConfigTest < Test::Unit::TestCase
     @cairo_png = PackageConfig.new("cairo-png", options)
   end
 
+  def only_pkg_config_version(major, minor)
+    pkg_config_version = `pkg-config --version`.chomp
+    current_major, current_minor = pkg_config_version.split(".").collect(&:to_i)
+    return if ([major, minor] <=> [current_major, current_minor]) >= 0
+    omit("Require pkg-config #{pkg_config_version} or later")
+  end
+
   def test_exist?
     assert(system('pkg-config --exists cairo'))
     assert(@cairo.exist?)
@@ -19,11 +26,13 @@ class PkgConfigTest < Test::Unit::TestCase
 
   def test_cflags
     assert_pkg_config("cairo", ["--cflags"], @cairo.cflags)
+    only_pkg_config_version(0, 29)
     assert_pkg_config("cairo-png", ["--cflags"], @cairo_png.cflags)
   end
 
   def test_cflags_only_I
     assert_pkg_config("cairo", ["--cflags-only-I"], @cairo.cflags_only_I)
+    only_pkg_config_version(0, 29)
     assert_pkg_config("cairo-png", ["--cflags-only-I"], @cairo_png.cflags_only_I)
   end
 
