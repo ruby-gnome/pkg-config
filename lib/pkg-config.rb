@@ -208,7 +208,10 @@ class PackageConfig
   private
   def collect_cflags
     cflags_set = [declaration("Cflags")]
-    cflags_set += all_required_packages.collect do |package|
+    cflags_set += required_packages.collect do |package|
+      self.class.new(package, @options).cflags
+    end
+    cflags_set += private_required_packages.collect do |package|
       self.class.new(package, @options).cflags
     end
     all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
@@ -374,6 +377,12 @@ class PackageConfig
 
   def required_packages
     requires.reject do |package|
+      @name == package
+    end.uniq
+  end
+
+  def private_required_packages
+    requires_private.reject do |package|
       @name == package
     end.uniq
   end
