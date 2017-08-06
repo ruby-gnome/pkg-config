@@ -54,7 +54,7 @@ class PkgConfigTest < Test::Unit::TestCase
 
     @cairo_png.msvc_syntax = true
     result = pkg_config("cairo-png", "--libs-only-l")
-    msvc_result = result.gsub(/-l(cairo|png[0-9]+)\b/, '\1.lib')
+    msvc_result = result.gsub(/-l(cairo|png[0-9]+|z)\b/, '\1.lib')
     assert_not_equal(msvc_result, result)
     assert_equal(msvc_result, @cairo_png.libs_only_l)
   end
