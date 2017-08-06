@@ -1,5 +1,19 @@
 = NEWS
 
+== 1.2.4 - 2017-08-07
+
+=== Improvements
+
+  * Added `pkg-config` 0.29 or later compatible result support.
+    [GitHub#13][Reported by HIGUCHI Daisuke]
+
+  * test: Updated expected value for the latest cairo.
+    [GitHub#14][Patch by HIGUCHI Daisuke]
+
+=== Thanks
+
+  * HIGUCHI Daisuke
+
 == 1.2.3 - 2017-05-29
 
 === Fixes
