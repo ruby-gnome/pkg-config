@@ -373,6 +373,13 @@ class PackageConfig
     paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
     paths << (pkg_config_prefix + "lib/pkgconfig").to_s
     paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+    if /-darwin\d+\z/ =~ RUBY_PLATFORM and
+        /\A(\d+\.\d+)\./ =~ `sw_vers -productVersion`
+      mac_os_version = $1
+      path = pkg_config_prefix +
+        "Library/Homebrew/os/mac/pkgconfig/#{mac_os_version}"
+      paths << path.to_s if path.exist?
+    end
     paths.concat(default_paths)
     paths.join(SEPARATOR)
   end
