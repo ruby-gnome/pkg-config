@@ -358,23 +358,23 @@ class PackageConfig
     when "x64-mingw32"
       default_paths.concat(Dir.glob("c:/msys*/mingw64/lib/pkgconfig"))
     end
-    default_path = default_paths.join(SEPARATOR)
     libdir = ENV["PKG_CONFIG_LIBDIR"]
-    default_path = [libdir, default_path].join(SEPARATOR) if libdir
+    default_paths.unshift(libdir) if libdir
 
     pkg_config = self.class.native_pkg_config
-    return default_path unless pkg_config.absolute?
+    return default_paths.join(SEPARATOR) unless pkg_config.absolute?
+
     pkg_config_prefix = pkg_config.parent.parent
-    pkg_config_arch_depended_path =
-      Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s).join(SEPARATOR)
-    [
-      pkg_config_arch_depended_path,
-      (pkg_config_prefix + "lib64/pkgconfig").to_s,
-      (pkg_config_prefix + "libx32/pkgconfig").to_s,
-      (pkg_config_prefix + "lib/pkgconfig").to_s,
-      (pkg_config_prefix + "libdata/pkgconfig").to_s,
-      default_path,
-    ].join(SEPARATOR)
+    pkg_config_arch_depended_paths =
+      Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
+    paths = []
+    paths.concat(pkg_config_arch_depended_paths)
+    paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
+    paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
+    paths << (pkg_config_prefix + "lib/pkgconfig").to_s
+    paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+    paths.concat(default_paths)
+    paths.join(SEPARATOR)
   end
 
   def required_packages
