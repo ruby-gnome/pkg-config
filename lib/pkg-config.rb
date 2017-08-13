@@ -376,9 +376,20 @@ class PackageConfig
     if /-darwin\d+\z/ =~ RUBY_PLATFORM and
         /\A(\d+\.\d+)\./ =~ `sw_vers -productVersion`
       mac_os_version = $1
-      path = pkg_config_prefix +
-        "Library/Homebrew/os/mac/pkgconfig/#{mac_os_version}"
-      paths << path.to_s if path.exist?
+      homebrew_repository_candidates = []
+      brew_path = pkg_config_prefix + "bin" + "brew"
+      if brew_path.exist?
+        escaped_brew_path = Shellwords.escape(brew_path.to_s)
+        homebrew_repository = `#{escaped_brew_path} --repository`.chomp
+        homebrew_repository_candidates << Pathname.new(homebrew_repository)
+      else
+        homebrew_repository_candidates << pkg_config_prefix + "Homebrew"
+        homebrew_repository_candidates << pkg_config_prefix
+      end
+      homebrew_repository_candidates.each do |candidate|
+        path = candidate + "Library/Homebrew/os/mac/pkgconfig/#{mac_os_version}"
+        paths << path.to_s if path.exist?
+      end
     end
     paths.concat(default_paths)
     paths.join(SEPARATOR)
