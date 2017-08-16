@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.2.7 - 2017-08-16
+
+=== Improvements
+
+  * Improved Homebrew repository detection.
+    [Reported by Wyatt Kirby]
+
+=== Thanks
+
+  * Wyatt Kirby
+
 == 1.2.6 - 2017-08-13
 
 === Improvements
