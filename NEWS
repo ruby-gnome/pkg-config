@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.2.8 - 2017-10-19
+
+=== Improvements
+
+  * Improved macOS environment detection.
+    [Reported by Simeon Manolov]
+
+=== Thanks
+
+  * Simeon Manolov
+
 == 1.2.7 - 2017-08-16
 
 === Improvements
