@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.2.9 - 2018-01-13
+
+=== Improvements
+
+  * Added more default paths for OpenBSD.
+    [GitHub#15][Reported by clintpachl]
+
+=== Thanks
+
+  * clintpachl
+
 == 1.2.8 - 2017-10-19
 
 === Improvements
