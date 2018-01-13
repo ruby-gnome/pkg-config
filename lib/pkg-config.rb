@@ -1,4 +1,4 @@
-# Copyright 2008-2017 Kouhei Sutou <kou@cozmixng.org>
+# Copyright 2008-2018 Kouhei Sutou <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -342,12 +342,15 @@ class PackageConfig
       "/usr/local/libx32/pkgconfig",
       "/usr/local/lib/pkgconfig",
       "/usr/local/libdata/pkgconfig",
+      "/usr/local/share/pkgconfig",
       "/opt/local/lib/pkgconfig",
       *arch_depended_path,
       "/usr/lib64/pkgconfig",
       "/usr/libx32/pkgconfig",
       "/usr/lib/pkgconfig",
       "/usr/libdata/pkgconfig",
+      "/usr/X11R6/lib/pkgconfig",
+      "/usr/X11R6/share/pkgconfig",
       "/usr/X11/lib/pkgconfig",
       "/opt/X11/lib/pkgconfig",
       "/usr/share/pkgconfig",
