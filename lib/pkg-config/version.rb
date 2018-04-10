@@ -15,5 +15,5 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 module PKGConfig
-  VERSION = "1.3.0"
+  VERSION = "1.3.1"
 end
