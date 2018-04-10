@@ -520,7 +520,9 @@ module PKGConfig
         $LDFLAGS += ' ' + dldflags
       end
       $CFLAGS += ' ' + cflags_only_other(pkg)
-      $CXXFLAGS += ' ' + cflags_only_other(pkg)
+      if defined?($CXXFLAGS)
+        $CXXFLAGS += ' ' + cflags_only_other(pkg)
+      end
       $INCFLAGS += ' ' + cflags_only_I(pkg)
     end
     enough_version
