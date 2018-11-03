@@ -235,9 +235,15 @@ class PackageConfig
       prefix = ""
       case RUBY_PLATFORM
       when "x86-mingw32"
-        prefix = Dir.glob("c:/msys{32,64,*}").first
+        ruby_prefix = RbConfig::CONFIG["prefix"]
+        candidates = Dir.glob("#{ruby_prefix}/msys{32,64,*}")
+        candidates.concat(Dir.glob("c:/msys{32,64,*}"))
+        prefix = candidates.first
       when "x64-mingw32"
-        prefix = Dir.glob("c:/msys{64,*}").first
+        ruby_prefix = RbConfig::CONFIG["prefix"]
+        candidates = Dir.glob("#{ruby_prefix}/msys{64,*}")
+        candidates.concat(Dir.glob("c:/msys{64,*}"))
+        prefix = candidates.first
       end
       if /\A[a-z]:/i === path
         "#{flag_option}#{path}"
@@ -357,8 +363,12 @@ class PackageConfig
     ]
     case RUBY_PLATFORM
     when "x86-mingw32"
+      prefix = RbConfig::CONFIG["prefix"]
+      default_paths.concat(Dir.glob("#{prefix}/msys*/mingw32/lib/pkgconfig"))
       default_paths.concat(Dir.glob("c:/msys*/mingw32/lib/pkgconfig"))
     when "x64-mingw32"
+      prefix = RbConfig::CONFIG["prefix"]
+      default_paths.concat(Dir.glob("#{prefix}/msys*/mingw64/lib/pkgconfig"))
       default_paths.concat(Dir.glob("c:/msys*/mingw64/lib/pkgconfig"))
     end
     libdir = ENV["PKG_CONFIG_LIBDIR"]
