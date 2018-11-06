@@ -68,9 +68,12 @@ class PackageConfig
     end
 
     def search_pkg_config_from_path(pkg_config)
+      exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
       (ENV["PATH"] || "").split(SEPARATOR).each do |path|
-        try_pkg_config = Pathname(path) + pkg_config
-        return try_pkg_config if try_pkg_config.exist?
+        exts.each do |ext|
+          try_pkg_config = Pathname(path) + "#{pkg_config}#{ext}"
+          return try_pkg_config if try_pkg_config.exist? & File.executable?(try_pkg_config)
+        end
       end
       nil
     end
