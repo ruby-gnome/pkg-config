@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.3.3 - 2019-02-10
+
+=== Improvements
+
+  * Improved MSYS2 detection on Windows.
+    [GitHub#16][Reported by dsisnero]
+
+=== Thanks
+
+  * dsisnero
+
 == 1.3.2 - 2018-11-03
 
 === Improvements
