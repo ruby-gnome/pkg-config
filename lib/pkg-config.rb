@@ -54,7 +54,9 @@ class PackageConfig
     end
 
     def guess_native_pkg_config
-      pkg_config = with_config("pkg-config", ENV["PKG_CONFIG"] || "pkg-config")
+      exeext = RbConfig::CONFIG["EXEEXT"]
+      default_pkg_config = ENV["PKG_CONFIG"] || "pkg-config#{exeext}"
+      pkg_config = with_config("pkg-config", default_pkg_config)
       pkg_config = Pathname.new(pkg_config)
       unless pkg_config.absolute?
         found_pkg_config = search_pkg_config_from_path(pkg_config)
