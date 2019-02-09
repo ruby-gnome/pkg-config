@@ -16,8 +16,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "lib"))
-require "pkg-config/version"
+require_relative "lib/pkg-config/version"
 
 Gem::Specification.new do |spec|
   spec.name = "pkg-config"
