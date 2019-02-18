@@ -236,7 +236,7 @@ class PackageConfig
       path = path_flag.sub(flag_option, "")
       prefix = ""
       case RUBY_PLATFORM
-      when "x86-mingw32"
+      when "i386-mingw32"
         ruby_prefix = RbConfig::CONFIG["prefix"]
         candidates = Dir.glob("#{ruby_prefix}/msys{32,64,*}")
         candidates.concat(Dir.glob("c:/msys{32,64,*}"))
