@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.3.5 - 2019-03-08
+
+=== Fixes
+
+  * Fixed MSYS2 detection installed at non standard folder.
+    [GitHub:ruby-gnome2/ruby-gnome2#1271][Reported by Simon Arnaud]
+
+=== Thanks
+
+  * Simon Arnaud
+
 == 1.3.4 - 2019-02-19
 
 === Fixes
