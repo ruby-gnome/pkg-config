@@ -1,4 +1,4 @@
-# Copyright 2008-2018 Kouhei Sutou <kou@cozmixng.org>
+# Copyright 2008-2019 Kouhei Sutou <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -34,6 +34,11 @@ class PackageConfig
       @native_pkg_config ||= guess_native_pkg_config
     end
 
+    @native_pkg_config_prefix = nil
+    def native_pkg_config_prefix
+      @native_pkg_config_prefix ||= compute_native_pkg_config_prefix
+    end
+
     @custom_override_variables = nil
     def custom_override_variables
       @custom_override_variables ||= with_config("override-variables", "")
@@ -41,6 +46,7 @@ class PackageConfig
 
     def clear_configure_args_cache
       @native_pkg_config = nil
+      @native_pkg_config_prefix = nil
       @custom_override_variables = nil
     end
 
@@ -110,6 +116,20 @@ class PackageConfig
         nil
       else
         Pathname(path.to_s)
+      end
+    end
+
+    def compute_native_pkg_config_prefix
+      pkg_config = native_pkg_config
+      return nil unless pkg_config.absolute?
+
+      pkg_config_prefix = pkg_config.parent.parent
+      if File::ALT_SEPARATOR
+        normalized_pkg_config_prefix =
+          pkg_config_prefix.to_s.split(File::ALT_SEPARATOR).join(File::SEPARATOR)
+        Pathname(normalized_pkg_config_prefix)
+      else
+        pkg_config_prefix
       end
     end
   end
@@ -232,26 +252,18 @@ class PackageConfig
   end
 
   def normalize_path_flags(path_flags, flag_option)
+    return path_flags unless /-mingw32\z/ === RUBY_PLATFORM
+
+    pkg_config_prefix = self.class.native_pkg_config_prefix
+    return path_flags unless pkg_config_prefix
+
+    mingw_dir = pkg_config_prefix.basename.to_s
     path_flags.collect do |path_flag|
-      path = path_flag.sub(flag_option, "")
-      prefix = ""
-      case RUBY_PLATFORM
-      when "i386-mingw32"
-        ruby_prefix = RbConfig::CONFIG["prefix"]
-        candidates = Dir.glob("#{ruby_prefix}/msys{32,64,*}")
-        candidates.concat(Dir.glob("c:/msys{32,64,*}"))
-        prefix = candidates.first
-      when "x64-mingw32"
-        ruby_prefix = RbConfig::CONFIG["prefix"]
-        candidates = Dir.glob("#{ruby_prefix}/msys{64,*}")
-        candidates.concat(Dir.glob("c:/msys{64,*}"))
-        prefix = candidates.first
+      path = path_flag.sub(/\A#{Regexp.escape(flag_option)}/, "")
+      path = path.sub(/\A\/#{Regexp.escape(mingw_dir)}/i) do
+        pkg_config_prefix.to_s
       end
-      if /\A[a-z]:/i === path
-        "#{flag_option}#{path}"
-      else
-        "#{flag_option}#{prefix}#{path}"
-      end
+      "#{flag_option}#{path}"
     end
   end
 
@@ -363,23 +375,12 @@ class PackageConfig
       "/opt/X11/lib/pkgconfig",
       "/usr/share/pkgconfig",
     ]
-    case RUBY_PLATFORM
-    when "x86-mingw32"
-      prefix = RbConfig::CONFIG["prefix"]
-      default_paths.concat(Dir.glob("#{prefix}/msys*/mingw32/lib/pkgconfig"))
-      default_paths.concat(Dir.glob("c:/msys*/mingw32/lib/pkgconfig"))
-    when "x64-mingw32"
-      prefix = RbConfig::CONFIG["prefix"]
-      default_paths.concat(Dir.glob("#{prefix}/msys*/mingw64/lib/pkgconfig"))
-      default_paths.concat(Dir.glob("c:/msys*/mingw64/lib/pkgconfig"))
-    end
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_paths.unshift(libdir) if libdir
 
-    pkg_config = self.class.native_pkg_config
-    return default_paths.join(SEPARATOR) unless pkg_config.absolute?
+    pkg_config_prefix = self.class.native_pkg_config_prefix
+    return default_paths.join(SEPARATOR) unless pkg_config_prefix
 
-    pkg_config_prefix = pkg_config.parent.parent
     pkg_config_arch_depended_paths =
       Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
     paths = []
