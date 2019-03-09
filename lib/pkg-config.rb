@@ -404,7 +404,7 @@ class PackageConfig
           homebrew_repository_candidates << pkg_config_prefix
         end
       else
-        brew = search_executable_from_path("brew")
+        brew = self.class.__send__(:search_executable_from_path, "brew")
         if brew
           homebrew_repository = `brew --repository`.chomp
           homebrew_repository_candidates << Pathname(homebrew_repository)
