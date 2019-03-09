@@ -65,7 +65,7 @@ class PackageConfig
       pkg_config = with_config("pkg-config", default_pkg_config)
       pkg_config = Pathname.new(pkg_config)
       unless pkg_config.absolute?
-        found_pkg_config = search_pkg_config_from_path(pkg_config)
+        found_pkg_config = search_executable_from_path(pkg_config)
         pkg_config = found_pkg_config if found_pkg_config
       end
       unless pkg_config.absolute?
@@ -75,10 +75,10 @@ class PackageConfig
       pkg_config
     end
 
-    def search_pkg_config_from_path(pkg_config)
+    def search_executable_from_path(name)
       (ENV["PATH"] || "").split(SEPARATOR).each do |path|
-        try_pkg_config = Pathname(path) + pkg_config
-        return try_pkg_config if try_pkg_config.exist?
+        try_name = Pathname(path) + name
+        return try_name if try_name.executable?
       end
       nil
     end
@@ -378,29 +378,37 @@ class PackageConfig
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_paths.unshift(libdir) if libdir
 
-    pkg_config_prefix = self.class.native_pkg_config_prefix
-    return default_paths.join(SEPARATOR) unless pkg_config_prefix
-
-    pkg_config_arch_depended_paths =
-      Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
     paths = []
-    paths.concat(pkg_config_arch_depended_paths)
-    paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
-    paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
-    paths << (pkg_config_prefix + "lib/pkgconfig").to_s
-    paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+    pkg_config_prefix = self.class.native_pkg_config_prefix
+    if pkg_config_prefix
+      pkg_config_arch_depended_paths =
+        Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
+      paths.concat(pkg_config_arch_depended_paths)
+      paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
+      paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
+      paths << (pkg_config_prefix + "lib/pkgconfig").to_s
+      paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+    end
     if /-darwin\d[\d\.]*\z/ =~ RUBY_PLATFORM and
         /\A(\d+\.\d+)/ =~ `sw_vers -productVersion`
       mac_os_version = $1
       homebrew_repository_candidates = []
-      brew_path = pkg_config_prefix + "bin" + "brew"
-      if brew_path.exist?
-        escaped_brew_path = Shellwords.escape(brew_path.to_s)
-        homebrew_repository = `#{escaped_brew_path} --repository`.chomp
-        homebrew_repository_candidates << Pathname.new(homebrew_repository)
+      if pkg_config_prefix
+        brew_path = pkg_config_prefix + "bin" + "brew"
+        if brew_path.exist?
+          escaped_brew_path = Shellwords.escape(brew_path.to_s)
+          homebrew_repository = `#{escaped_brew_path} --repository`.chomp
+          homebrew_repository_candidates << Pathname.new(homebrew_repository)
+        else
+          homebrew_repository_candidates << pkg_config_prefix + "Homebrew"
+          homebrew_repository_candidates << pkg_config_prefix
+        end
       else
-        homebrew_repository_candidates << pkg_config_prefix + "Homebrew"
-        homebrew_repository_candidates << pkg_config_prefix
+        brew = search_executable_from_path("brew")
+        if brew
+          homebrew_repository = `brew --repository`.chomp
+          homebrew_repository_candidates << Pathname(homebrew_repository)
+        end
       end
       homebrew_repository_candidates.each do |candidate|
         path = candidate + "Library/Homebrew/os/mac/pkgconfig/#{mac_os_version}"
