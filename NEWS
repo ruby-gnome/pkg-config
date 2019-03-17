@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.3.7 - 2019-03-17
+
+=== Improvements
+
+  * Added support for alphabet and _ only version.
+    [GitHub#17][Reported by xiejiangzhi]
+
+=== Thanks
+
+  * xiejiangzhi
+
 == 1.3.6 - 2019-03-09
 
 === Improvements
