@@ -148,4 +148,15 @@ class PkgConfigTest < Test::Unit::TestCase
   ensure
     $configure_args = original_configure_args
   end
+
+  sub_test_case("#parse_requires") do
+    def parse_requires(requires)
+      @cairo.__send__(:parse_requires, requires)
+    end
+
+    def test_broken_version
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi >= fribidi_required_dep"))
+    end
+  end
 end
