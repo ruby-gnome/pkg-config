@@ -39,7 +39,9 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs
     assert_pkg_config("cairo", ["--libs"], @cairo.libs)
     assert_pkg_config("cairo-png", ["--libs"], @cairo_png.libs)
+  end
 
+  def test_libs_msvc
     @cairo.msvc_syntax = true
     result = pkg_config("cairo", "--libs")
     msvc_result = result.gsub(/-lcairo\b/, "cairo.lib")
@@ -51,7 +53,9 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs_only_l
     assert_pkg_config("cairo", ["--libs-only-l"], @cairo.libs_only_l)
     assert_pkg_config("cairo-png", ["--libs-only-l"], @cairo_png.libs_only_l)
+  end
 
+  def test_libs_only_l_msvc
     @cairo_png.msvc_syntax = true
     result = pkg_config("cairo-png", "--libs-only-l")
     msvc_result = result.gsub(/-l(cairo|png[0-9]+|z)\b/, '\1.lib')
@@ -62,7 +66,9 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs_only_L
     assert_pkg_config("cairo", ["--libs-only-L"], @cairo.libs_only_L)
     assert_pkg_config("cairo-png", ["--libs-only-L"], @cairo_png.libs_only_L)
+  end
 
+  def test_libs_only_L_msvc
     @cairo_png.msvc_syntax = true
     result = pkg_config("cairo-png", "--libs-only-L")
     msvc_result = result.gsub(/-L/, '/libpath:')
