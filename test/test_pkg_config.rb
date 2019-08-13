@@ -36,6 +36,55 @@ class PkgConfigTest < Test::Unit::TestCase
     assert_pkg_config("cairo-png", ["--cflags-only-I"], @cairo_png.cflags_only_I)
   end
 
+  def split_lib_flags(libs_command_line)
+    @cairo.__send__(:split_lib_flags, libs_command_line)
+  end
+
+  def test_split_libs
+    assert_equal([
+                   "-L/usr/local/Cellar/gtk+3/3.24.10/lib",
+                   "-L/usr/local/Cellar/pango/1.44.3/lib",
+                   "-L/usr/local/Cellar/harfbuzz/2.5.3/lib",
+                   "-L/usr/local/Cellar/gdk-pixbuf/2.38.1_1/lib",
+                   "-L/usr/local/Cellar/cairo/1.16.0_2/lib",
+                   "-L/usr/local/Cellar/glib/2.60.6/lib",
+                   "-L/usr/local/opt/gettext/lib",
+                   "-lgdk-3",
+                   "-framework", "Cocoa",
+                   "-framework", "Carbon",
+                   "-framework", "CoreGraphics",
+                   "-lpangocairo-1.0",
+                   "-lpango-1.0",
+                   "-lharfbuzz",
+                   "-lgdk_pixbuf-2.0",
+                   "-lcairo-gobject",
+                   "-lcairo",
+                   "-lgobject-2.0",
+                   "-lglib-2.0",
+                   "-lintl"
+                 ],
+                 split_lib_flags("-L/usr/local/Cellar/gtk+3/3.24.10/lib " +
+                                 "-L/usr/local/Cellar/pango/1.44.3/lib " +
+                                 "-L/usr/local/Cellar/harfbuzz/2.5.3/lib " +
+                                 "-L/usr/local/Cellar/gdk-pixbuf/2.38.1_1/lib " +
+                                 "-L/usr/local/Cellar/cairo/1.16.0_2/lib " +
+                                 "-L/usr/local/Cellar/glib/2.60.6/lib " +
+                                 "-L/usr/local/opt/gettext/lib " +
+                                 "-lgdk-3 " +
+                                 "-framework Cocoa " +
+                                 "-framework Carbon " +
+                                 "-framework CoreGraphics " +
+                                 "-lpangocairo-1.0 " +
+                                 "-lpango-1.0 " +
+                                 "-lharfbuzz " +
+                                 "-lgdk_pixbuf-2.0 " +
+                                 "-lcairo-gobject " +
+                                 "-lcairo " +
+                                 "-lgobject-2.0 " +
+                                 "-lglib-2.0 " +
+                                 "-lintl"))
+  end
+
   def test_libs
     assert_pkg_config("cairo", ["--libs"], @cairo.libs)
     assert_pkg_config("cairo-png", ["--libs"], @cairo_png.libs)

@@ -293,8 +293,8 @@ class PackageConfig
       self.class.new(package, @options).libs
     end
     all_libs = [declaration("Libs")] + all_libs
-    all_libs = all_libs.join(" ").gsub(/-([Ll]) /, '\1').split.uniq
-    path_flags, other_flags = all_libs.partition {|flag| /\A-L/ =~ flag}
+    all_flags = split_lib_flags(all_libs.join(" "))
+    path_flags, other_flags = all_flags.partition {|flag| /\A-L/ =~ flag}
     path_flags = normalize_path_flags(path_flags, "-L")
     path_flags = path_flags.reject do |flag|
       /\A-L\/usr\/lib(?:64|x32)?\z/ =~ flag
@@ -312,6 +312,29 @@ class PackageConfig
       end
     end
     [path_flags, other_flags]
+  end
+
+  def split_lib_flags(libs_command_line)
+    all_flags = {}
+    flags = []
+    in_option = false
+    libs_command_line.gsub(/-([Ll]) /, '\1').split.each do |arg|
+      if in_option
+        flags << arg
+        in_option = false
+      else
+        case arg
+        when /-[lL]/
+          next if all_flags.key?(arg)
+          all_flags[arg] = true
+          flags << arg
+          in_option = true
+        else
+          flags << arg
+        end
+      end
+    end
+    flags
   end
 
   IDENTIFIER_RE = /[a-zA-Z\d_\.]+/
