@@ -21,7 +21,7 @@ require_relative "lib/pkg-config/version"
 Gem::Specification.new do |spec|
   spec.name = "pkg-config"
   spec.version = PKGConfig::VERSION
-  spec.homepage = "https://github.com/ruby-gnome2/pkg-config"
+  spec.homepage = "https://github.com/ruby-gnome/pkg-config"
   spec.authors = ["Kouhei Sutou"]
   spec.email = ["kou@cozmixng.org"]
   spec.summary = 'A pkg-config implementation for Ruby'

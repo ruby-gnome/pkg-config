@@ -14,13 +14,7 @@ A pkg-config implementation by Ruby.
 
 == Install
 
-=== Package
-
   # gem install pkg-config
-
-=== No package
-
-  # ruby setup.rb
 
 == Documents
 
@@ -29,11 +23,11 @@ A pkg-config implementation by Ruby.
 == Source
 
 There is the pkg-config repository at GitHub:
-http://github.com/rcairo/pkg-config
+http://github.com/ruby-gnome/pkg-config
 
 == Copyright
 
-Copyright 2008-2011 Kouhei Sutou <kou@clear-code.com>
+Copyright 2008-2019 Kouhei Sutou <kou@clear-code.com>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

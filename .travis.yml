@@ -1,11 +1,8 @@
-dist: trusty
 rvm:
-  - 2.1
-  - 2.2
-  - 2.3
-  - 2.4.4
-  - 2.5.1
+  - 2.4
+  - 2.5
+  - 2.6
 notifications:
   email:
     recipients:
-      - ruby-gnome2@ml.commit-email.info
+      - ruby-gnome@ml.commit-email.info
