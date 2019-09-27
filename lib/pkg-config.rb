@@ -265,10 +265,14 @@ class PackageConfig
   end
 
   private
-  def collect_cflags
-    target_packages = [self, *all_required_packages].sort_by do |package|
-      package.path_position
+  def sort_packages(packages)
+    packages.sort_by.with_index do |package, i|
+      [package.path_position, i]
     end
+  end
+
+  def collect_cflags
+    target_packages = sort_packages([self, *all_required_packages])
     cflags_set = []
     target_packages.each do |package|
       cflags_set << package.declaration("Cflags")
@@ -322,9 +326,7 @@ class PackageConfig
   end
 
   def collect_libs
-    target_packages = (required_packages + [self]).sort_by do |package|
-      package.path_position
-    end
+    target_packages = sort_packages(required_packages + [self])
     libs_set = []
     target_packages.each do |package|
       libs_set << package.declaration("Libs")
