@@ -144,7 +144,6 @@ class PackageConfig
       @pc_path = nil
       @name = name
     end
-    @name = name
     @options = options
     path = @options[:path] || ENV["PKG_CONFIG_PATH"]
     @paths = [path, guess_default_path].compact.join(SEPARATOR).split(SEPARATOR)
