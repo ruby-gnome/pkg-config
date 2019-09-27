@@ -359,7 +359,10 @@ class PackageConfig
   def parse_requires(requires)
     return [] if requires.nil?
     requires_without_version = requires.gsub(/[<>]?=\s*[\d.a-zA-Z_-]+\s*/, '')
-    requires_without_version.split(/[,\s]+/)
+    requires_without_version.split(/[,\s]+/).collect do |package|
+      next package unless package.include?(File::SEPARATOR)
+      File.basename(package, File.extname(package))
+    end
   end
 
   def parse_override_variables(override_variables)
