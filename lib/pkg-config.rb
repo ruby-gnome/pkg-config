@@ -134,14 +134,17 @@ class PackageConfig
     end
   end
 
+  attr_reader :name
   attr_reader :paths
   attr_accessor :msvc_syntax
   def initialize(name, options={})
     if Pathname(name).absolute?
       @pc_path = name
+      @path_position = 0
       @name = File.basename(@pc_path, ".*")
     else
       @pc_path = nil
+      @path_position = nil
       @name = name
     end
     @options = options
@@ -229,30 +232,54 @@ class PackageConfig
     if @pc_path
       return @pc_path if File.exist?(@pc_path)
     else
-      @paths.each do |path|
+      @paths.each_with_index do |path, i|
         _pc_path = File.join(path, "#{@name}.pc")
-        return _pc_path if File.exist?(_pc_path)
+        if File.exist?(_pc_path)
+          @path_position = i + 1
+          return _pc_path
+        end
       end
     end
     nil
   end
 
+  protected
+  def path_position
+    @path_position
+  end
+
+  def collect_requires(&block)
+    packages = []
+    targets = yield(self)
+    targets.each do |name|
+      package = self.class.new(name, @options)
+      packages << package
+      packages.concat(package.collect_requires(&block))
+    end
+    packages_without_self = packages.reject do |package|
+      package.name == @name
+    end
+    packages_without_self.uniq do |package|
+      package.name
+    end
+  end
+
   private
   def collect_cflags
-    cflags_set = [declaration("Cflags")]
-    cflags_set += private_required_packages.collect do |package|
-      self.class.new(package, @options).cflags
+    target_packages = [self, *all_required_packages].sort_by do |package|
+      package.path_position
     end
-    cflags_set += required_packages.collect do |package|
-      self.class.new(package, @options).cflags
+    cflags_set = []
+    target_packages.each do |package|
+      cflags_set << package.declaration("Cflags")
     end
     all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
     path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
     path_flags = normalize_path_flags(path_flags, "-I")
-    path_flags = remove_duplicated_include_paths(path_flags)
     path_flags = path_flags.reject do |flag|
       flag == "-I/usr/include"
     end
+    path_flags = path_flags.uniq
     if @msvc_syntax
       path_flags = path_flags.collect do |flag|
         flag.gsub(/\A-I/, "/I")
@@ -294,21 +321,21 @@ class PackageConfig
     normalized_cflags
   end
 
-  def remove_duplicated_include_paths(path_flags)
-    path_flags.uniq
-  end
-
   def collect_libs
-    all_libs = required_packages.collect do |package|
-      self.class.new(package, @options).libs
+    target_packages = (required_packages + [self]).sort_by do |package|
+      package.path_position
     end
-    all_libs = [declaration("Libs")] + all_libs
-    all_flags = split_lib_flags(all_libs.join(" "))
+    libs_set = []
+    target_packages.each do |package|
+      libs_set << package.declaration("Libs")
+    end
+    all_flags = split_lib_flags(libs_set.join(" "))
     path_flags, other_flags = all_flags.partition {|flag| /\A-L/ =~ flag}
     path_flags = normalize_path_flags(path_flags, "-L")
     path_flags = path_flags.reject do |flag|
       /\A-L\/usr\/lib(?:64|x32)?\z/ =~ flag
     end
+    path_flags = path_flags.uniq
     if @msvc_syntax
       path_flags = path_flags.collect do |flag|
         flag.gsub(/\A-L/, "/libpath:")
@@ -453,21 +480,15 @@ class PackageConfig
   end
 
   def required_packages
-    requires.reject do |package|
-      @name == package
-    end.uniq
-  end
-
-  def private_required_packages
-    requires_private.reject do |package|
-      @name == package
-    end.uniq
+    collect_requires do |package|
+      package.requires
+    end
   end
 
   def all_required_packages
-    (requires_private + requires.reverse).reject do |package|
-      @name == package
-    end.uniq
+    collect_requires do |package|
+      package.requires_private + package.requires
+    end
   end
 
   def normalize_paths(paths)
