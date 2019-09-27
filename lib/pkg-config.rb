@@ -137,6 +137,13 @@ class PackageConfig
   attr_reader :paths
   attr_accessor :msvc_syntax
   def initialize(name, options={})
+    if Pathname(name).absolute?
+      @pc_path = name
+      @name = File.basename(@pc_path, ".*")
+    else
+      @pc_path = nil
+      @name = name
+    end
     @name = name
     @options = options
     path = @options[:path] || ENV["PKG_CONFIG_PATH"]
@@ -220,9 +227,13 @@ class PackageConfig
   end
 
   def pc_path
-    @paths.each do |path|
-      _pc_path = File.join(path, "#{@name}.pc")
-      return _pc_path if File.exist?(_pc_path)
+    if @pc_path
+      return @pc_path if File.exist?(@pc_path)
+    else
+      @paths.each do |path|
+        _pc_path = File.join(path, "#{@name}.pc")
+        return _pc_path if File.exist?(_pc_path)
+      end
     end
     nil
   end
