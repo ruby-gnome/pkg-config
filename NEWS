@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.3.9 - 2019-09-28
+
+=== Improvements
+
+  * Added support for absolute path in Requires.
+    [GitHub#18][Reported by Josh Huckabee]
+
+=== Thanks
+
+  * Josh Huckabee
+
 == 1.3.8 - 2019-08-13
 
 === Improvements
