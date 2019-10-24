@@ -466,14 +466,13 @@ class PackageConfig
           homebrew_repository_candidates << pkg_config_prefix + "Homebrew"
           homebrew_repository_candidates << pkg_config_prefix
         end
-      else
-        brew = self.class.__send__(:search_executable_from_path, "brew")
-        if brew
-          homebrew_repository = `brew --repository`.chomp
-          homebrew_repository_candidates << Pathname(homebrew_repository)
-        end
       end
-      homebrew_repository_candidates.each do |candidate|
+      brew = self.class.__send__(:search_executable_from_path, "brew")
+      if brew
+        homebrew_repository = `brew --repository`.chomp
+        homebrew_repository_candidates << Pathname(homebrew_repository)
+      end
+      homebrew_repository_candidates.uniq.each do |candidate|
         path = candidate + "Library/Homebrew/os/mac/pkgconfig/#{mac_os_version}"
         paths << path.to_s if path.exist?
       end
