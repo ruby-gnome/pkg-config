@@ -122,6 +122,7 @@ class PackageConfig
     def compute_native_pkg_config_prefix
       pkg_config = native_pkg_config
       return nil unless pkg_config.absolute?
+      return nil unless pkg_config.exist?
 
       pkg_config_prefix = pkg_config.parent.parent
       if File::ALT_SEPARATOR
