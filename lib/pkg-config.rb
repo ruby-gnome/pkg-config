@@ -248,13 +248,15 @@ class PackageConfig
     @path_position
   end
 
-  def collect_requires(&block)
+  def collect_requires(processed_packages={}, &block)
     packages = []
     targets = yield(self)
     targets.each do |name|
+      next if processed_packages.key?(name)
       package = self.class.new(name, @options)
+      processed_packages[name] = package
       packages << package
-      packages.concat(package.collect_requires(&block))
+      packages.concat(package.collect_requires(processed_packages, &block))
     end
     packages_without_self = packages.reject do |package|
       package.name == @name
