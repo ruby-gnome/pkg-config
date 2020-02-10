@@ -19,11 +19,10 @@ begin
 rescue LoadError
 end
 
-require "rbconfig"
-
-require "shellwords"
 require "English"
 require "pathname"
+require "rbconfig"
+require "shellwords"
 
 class PackageConfig
   SEPARATOR = File::PATH_SEPARATOR
