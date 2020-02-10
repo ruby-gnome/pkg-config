@@ -17,10 +17,10 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_exist?
-    assert(system('pkg-config --exists cairo'))
+    assert(system("pkg-config --exists cairo"))
     assert(@cairo.exist?)
 
-    assert(system('pkg-config --exists cairo-png'))
+    assert(system("pkg-config --exists cairo-png"))
     assert(@cairo_png.exist?)
   end
 
@@ -94,7 +94,7 @@ class PkgConfigTest < Test::Unit::TestCase
     @cairo.msvc_syntax = true
     result = pkg_config("cairo", "--libs")
     msvc_result = result.gsub(/-lcairo\b/, "cairo.lib")
-    msvc_result = msvc_result.gsub(/-L/, '/libpath:')
+    msvc_result = msvc_result.gsub(/-L/, "/libpath:")
     assert_not_equal(msvc_result, result)
     assert_equal(msvc_result, @cairo.libs)
   end
@@ -107,7 +107,7 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs_only_l_msvc
     @cairo_png.msvc_syntax = true
     result = pkg_config("cairo-png", "--libs-only-l")
-    msvc_result = result.gsub(/-l(cairo|png[0-9]+|z)\b/, '\1.lib')
+    msvc_result = result.gsub(/-l(cairo|png[0-9]+|z)\b/, "\\1.lib")
     assert_not_equal(msvc_result, result)
     assert_equal(msvc_result, @cairo_png.libs_only_l)
   end
@@ -120,7 +120,7 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs_only_L_msvc
     @cairo_png.msvc_syntax = true
     result = pkg_config("cairo-png", "--libs-only-L")
-    msvc_result = result.gsub(/-L/, '/libpath:')
+    msvc_result = result.gsub(/-L/, "/libpath:")
     assert_not_equal(msvc_result, result)
     assert_equal(msvc_result, @cairo_png.libs_only_L)
   end
@@ -167,7 +167,7 @@ class PkgConfigTest < Test::Unit::TestCase
   private
   def pkg_config(package, *args)
     args.unshift("--define-variable=libdir=#{@custom_libdir}")
-    args = args.collect {|arg| arg.dump}.join(' ')
+    args = args.collect {|arg| arg.dump}.join(" ")
     `pkg-config #{args} #{package}`.strip
   end
 

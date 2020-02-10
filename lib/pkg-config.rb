@@ -21,9 +21,9 @@ end
 
 require "rbconfig"
 
-require 'shellwords'
-require 'English'
-require 'pathname'
+require "shellwords"
+require "English"
+require "pathname"
 
 class PackageConfig
   SEPARATOR = File::PATH_SEPARATOR
@@ -358,7 +358,7 @@ class PackageConfig
     all_flags = {}
     flags = []
     in_option = false
-    libs_command_line.gsub(/-([Ll]) /, '\1').split.each do |arg|
+    libs_command_line.gsub(/-([Ll]) /, "\\1").split.each do |arg|
       if in_option
         flags << arg
         in_option = false
@@ -384,7 +384,7 @@ class PackageConfig
     @declarations = {}
     File.open(pc_path) do |input|
       input.each_line do |line|
-        line = line.gsub(/#.*/, '').strip
+        line = line.gsub(/#.*/, "").strip
         next if line.empty?
         case line
         when /^(#{IDENTIFIER_RE})=/
@@ -398,7 +398,7 @@ class PackageConfig
 
   def parse_requires(requires)
     return [] if requires.nil?
-    requires_without_version = requires.gsub(/[<>]?=\s*[\d.a-zA-Z_-]+\s*/, '')
+    requires_without_version = requires.gsub(/[<>]?=\s*[\d.a-zA-Z_-]+\s*/, "")
     requires_without_version.split(/[,\s]+/)
   end
 
@@ -514,7 +514,7 @@ module PKGConfig
   end
 
   def msvc?
-    /mswin/.match(RUBY_PLATFORM) and /^cl\b/.match(RbConfig::CONFIG['CC'])
+    /mswin/.match(RUBY_PLATFORM) and /^cl\b/.match(RbConfig::CONFIG["CC"])
   end
 
   def package_config(package)
@@ -589,18 +589,18 @@ module PKGConfig
       dldflags = libs(pkg)
       dldflags = (Shellwords.shellwords(dldflags) -
                   Shellwords.shellwords(libraries))
-      dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(' ')
-      $libs   += ' ' + libraries
+      dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(" ")
+      $libs   += " " + libraries
       if /mswin/ =~ RUBY_PLATFORM
-        $DLDFLAGS += ' ' + dldflags
+        $DLDFLAGS += " " + dldflags
       else
-        $LDFLAGS += ' ' + dldflags
+        $LDFLAGS += " " + dldflags
       end
-      $CFLAGS += ' ' + cflags_only_other(pkg)
+      $CFLAGS += " " + cflags_only_other(pkg)
       if defined?($CXXFLAGS)
-        $CXXFLAGS += ' ' + cflags_only_other(pkg)
+        $CXXFLAGS += " " + cflags_only_other(pkg)
       end
-      $INCFLAGS += ' ' + cflags_only_I(pkg)
+      $INCFLAGS += " " + cflags_only_I(pkg)
     end
     enough_version
   end
