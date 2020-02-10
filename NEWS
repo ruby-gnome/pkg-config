@@ -1,5 +1,17 @@
 = NEWS
 
+== 1.4.1 - 2020-02-10
+
+=== Improvements
+
+  * Added support for cycled depended .pc such as freetype2.pc and
+    harfbuzz.pc on PLD Linux.
+    [Reported by Jakub Bogusz]
+
+=== Thanks
+
+  * Jakub Bogusz
+
 == 1.4.0 - 2019-10-24
 
 === Improvements
