@@ -1,5 +1,12 @@
 = NEWS
 
+== 1.4.2 - 2020-08-10
+
+=== Improvements
+
+  * Added support for detecting pkgconfig path on RubyInstaller
+    without "ridk exec".
+
 == 1.4.1 - 2020-02-10
 
 === Improvements
