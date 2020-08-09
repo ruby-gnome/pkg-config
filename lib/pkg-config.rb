@@ -439,6 +439,11 @@ class PackageConfig
       "/opt/X11/lib/pkgconfig",
       "/usr/share/pkgconfig",
     ]
+    if Object.const_defined?(:RubyInstaller)
+      mingw_bin_path = RubyInstaller::Runtime.msys2_installation.mingw_bin_path
+      mingw_pkgconfig_path = Pathname.new(mingw_bin_path) + "../lib/pkgconfig"
+      default_paths.unshift(mingw_pkgconfig_path.cleanpath.to_s)
+    end
     libdir = ENV["PKG_CONFIG_LIBDIR"]
     default_paths.unshift(libdir) if libdir
 
