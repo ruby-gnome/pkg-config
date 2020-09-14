@@ -25,6 +25,12 @@ require "rbconfig"
 require "shellwords"
 
 class PackageConfig
+  class Error < StandardError
+  end
+
+  class NotFoundError < Error
+  end
+
   SEPARATOR = File::PATH_SEPARATOR
 
   class << self
@@ -380,7 +386,7 @@ class PackageConfig
 
   IDENTIFIER_RE = /[a-zA-Z\d_\.]+/
   def parse_pc
-    raise ".pc for #{@name} doesn't exist." unless exist?
+    raise NotFoundError ".pc for #{@name} doesn't exist." unless exist?
     @variables = {}
     @declarations = {}
     File.open(pc_path) do |input|
