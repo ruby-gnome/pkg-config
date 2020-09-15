@@ -8,17 +8,13 @@ pkg-config
 
 A pkg-config implementation by Ruby.
 
-== Dependencies
-
-* ruby >= 1.8 (1.9.2 is also supported!)
-
 == Install
 
   # gem install pkg-config
 
 == Documents
 
-* TODO
+* https://rubydoc.info/gems/pkg-config
 
 == Source
 
@@ -27,7 +23,7 @@ http://github.com/ruby-gnome/pkg-config
 
 == Copyright
 
-Copyright 2008-2019 Kouhei Sutou <kou@clear-code.com>
+Copyright 2008-2020 Kouhei Sutou <kou@clear-code.com>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -44,10 +40,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 See LGPL-2.1 file for details.
-
-== Mailing list
-
-TODO
 
 == Thanks
 
