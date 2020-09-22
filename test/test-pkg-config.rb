@@ -164,6 +164,13 @@ class PkgConfigTest < Test::Unit::TestCase
     end
   end
 
+  def test_not_found
+    message = ".pc doesn't exist: <nonexistent>"
+    assert_raise(PackageConfig::NotFoundError.new(message)) do
+      PKGConfig.modversion("nonexistent")
+    end
+  end
+
   private
   def pkg_config(package, *args)
     args.unshift("--define-variable=libdir=#{@custom_libdir}")
