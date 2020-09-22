@@ -386,7 +386,7 @@ class PackageConfig
 
   IDENTIFIER_RE = /[a-zA-Z\d_\.]+/
   def parse_pc
-    raise NotFoundError ".pc for #{@name} doesn't exist." unless exist?
+    raise NotFoundError, ".pc for #{@name} doesn't exist." unless exist?
     @variables = {}
     @declarations = {}
     File.open(pc_path) do |input|
