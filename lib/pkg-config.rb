@@ -1,4 +1,4 @@
-# Copyright 2008-2020  Sutou Kouhei <kou@cozmixng.org>
+# Copyright 2008-2021  Sutou Kouhei <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -485,7 +485,11 @@ class PackageConfig
         homebrew_repository_candidates << Pathname(homebrew_repository)
       end
       homebrew_repository_candidates.uniq.each do |candidate|
-        path = candidate + "Library/Homebrew/os/mac/pkgconfig/#{mac_os_version}"
+        pkgconfig_base_path = candidate + "Library/Homebrew/os/mac/pkgconfig"
+        path = pkgconfig_base_path + mac_os_version
+        unless path.exist?
+          path = pkgconfig_base_path + mac_os_version.gsub(/\.\d+\z/, "")
+        end
         paths << path.to_s if path.exist?
       end
     end
