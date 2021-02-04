@@ -1,12 +1,23 @@
 = NEWS
 
+== 1.4.5 - 2021-02-04
+
+=== Improvements
+
+  * Added support for macOS 11.2.
+    [Reported by Ludovic Moutury][GitHub:rcairo/rcairo#69]
+
+=== Thanks
+
+  * Ludovic Moutury
+
 == 1.4.4 - 2020-09-23
 
 === Fixes
 
   * Fixed a bug that NoMethodError instead of
     PackageConfig::NotFoundError is raised.
-    [Fixed by kojix2][GitHub#21]
+    [GitHub#21][Fixed by kojix2]
 
 === Thanks
 
