@@ -26,11 +26,16 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-      - name: Install system
+      - name: Install system dependencies
         if: |
           runner.os == 'macOS'
         run: |
           brew bundle
+      - name: Install system dependencies
+        if: |
+          runner.os == 'Windows'
+        run: |
+          ridk exec pacman --sync --noconfirm cairo
       - name: Install dependencies
         run: |
           bundle install
