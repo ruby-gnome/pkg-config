@@ -463,6 +463,7 @@ class PackageConfig
       paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
       paths << (pkg_config_prefix + "lib/pkgconfig").to_s
       paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+      paths << (pkg_config_prefix + "share/pkgconfig").to_s
     end
     if /-darwin\d[\d\.]*\z/ =~ RUBY_PLATFORM and
         /\A(\d+\.\d+)/ =~ `sw_vers -productVersion`
