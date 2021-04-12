@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.4.6 - 2021-04-12
+
+=== Improvements
+
+  * Improved support for .pc detection installed by Homebrew.
+    [Reported by Evan Shea][GitHub:rcairo/rcairo#66]
+
+=== Thanks
+
+  * Evan Shea
+
 == 1.4.5 - 2021-02-04
 
 === Improvements
