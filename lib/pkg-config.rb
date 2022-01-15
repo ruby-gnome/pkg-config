@@ -301,7 +301,7 @@ class PackageConfig
   end
 
   def normalize_path_flags(path_flags, flag_option)
-    return path_flags unless /-mingw(?:32-ucrt)\z/ === RUBY_PLATFORM
+    return path_flags unless /-mingw(?:32|-ucrt)\z/ === RUBY_PLATFORM
 
     pkg_config_prefix = self.class.native_pkg_config_prefix
     return path_flags unless pkg_config_prefix
