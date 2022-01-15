@@ -177,7 +177,16 @@ class PkgConfigTest < Test::Unit::TestCase
   def pkg_config(package, *args)
     args.unshift("--define-variable=libdir=#{@custom_libdir}")
     args = args.collect {|arg| arg.dump}.join(" ")
-    `pkg-config #{args} #{package}`.strip
+    normalize_pkg_config_result(`pkg-config #{args} #{package}`.strip)
+  end
+
+  def normalize_pkg_config_result(result)
+    case RUBY_PLATFORM
+    when /mingw/
+      result.gsub(/\/bin\/..\//, "/")
+    else
+      result
+    end
   end
 
   def assert_pkg_config(package, pkg_config_args, actual)
