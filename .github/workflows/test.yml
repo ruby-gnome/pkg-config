@@ -36,7 +36,7 @@ jobs:
         if: |
           runner.os == 'Windows'
         run: |
-          ridk exec pacman --sync --noconfirm mingw-w64-x86_64-cairo mingw-w64-ucrt-cairo
+          ridk exec pacman --sync --noconfirm mingw-w64-x86_64-cairo mingw-w64-ucrt-x86_64-cairo
       - name: Install dependencies
         run: |
           bundle install
