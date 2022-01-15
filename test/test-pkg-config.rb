@@ -183,7 +183,13 @@ class PkgConfigTest < Test::Unit::TestCase
   def normalize_pkg_config_result(result)
     case RUBY_PLATFORM
     when /mingw/
-      result.gsub(/\/bin\/..\//, "/")
+      result = result.gsub(/\/bin\/..\//, "/")
+      if result.include?(" -mms-bitfields ")
+        # Reorder -mms-bitfields (non path flag)
+        result = result.gsub(" -mms-bitfields ", "")
+        result = "-mms-bitfields #{result}"
+      end
+      result
     else
       result
     end
