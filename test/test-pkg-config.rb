@@ -186,7 +186,7 @@ class PkgConfigTest < Test::Unit::TestCase
       result = result.gsub(/\/bin\/..\//, "/")
       if result.include?(" -mms-bitfields ")
         # Reorder -mms-bitfields (non path flag)
-        result = result.gsub(" -mms-bitfields ", "")
+        result = result.gsub(" -mms-bitfields ", " ")
         result = "-mms-bitfields #{result}"
       end
       result
