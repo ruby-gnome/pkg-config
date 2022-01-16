@@ -1,5 +1,16 @@
 = NEWS
 
+== 1.4.7 - 2022-01-16
+
+=== Improvements
+
+  * Added support for RubyInstaller2 3.1 or later.
+    [Reported by golirev][GitHub:ruby-gnome/ruby-gnome#1457]
+
+=== Thanks
+
+  * golirev
+
 == 1.4.6 - 2021-04-12
 
 === Improvements
