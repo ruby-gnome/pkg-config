@@ -1,5 +1,11 @@
 = NEWS
 
+== 1.4.8 - 2022-07-30
+
+=== Improvements
+
+  * Added support for showing found package version.
+
 == 1.4.7 - 2022-01-16
 
 === Improvements
