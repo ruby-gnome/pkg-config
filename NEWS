@@ -1,5 +1,15 @@
 = NEWS
 
+== 1.4.9 - 2022-07-31
+
+This is a bug fix release of 1.4.8. All 1.4.8 users should be upgraded
+to 1.4.9.
+
+=== Fixes
+
+  * Fixed a regression bug in 1.4.8 that PkgConfig.have_package can't
+    detect nonexistent package.
+
 == 1.4.8 - 2022-07-30
 
 === Improvements
