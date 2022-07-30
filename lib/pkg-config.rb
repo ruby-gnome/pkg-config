@@ -1,4 +1,4 @@
-# Copyright 2008-2021  Sutou Kouhei <kou@cozmixng.org>
+# Copyright 2008-2022  Sutou Kouhei <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -598,8 +598,12 @@ module PKGConfig
       message << " version (>= #{major}.#{minor}.#{micro})"
     end
     major ||= 0
-    enough_version = checking_for(checking_message(message)) do
-      check_version?(pkg, major, minor, micro)
+    enough_version = checking_for(checking_message(message), "%s") do
+      if check_version?(pkg, major, minor, micro)
+        "yes (#{modversion(pkg)})"
+      else
+        "no"
+      end
     end
     if enough_version
       libraries = libs_only_l(pkg)
