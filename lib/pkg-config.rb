@@ -598,13 +598,14 @@ module PKGConfig
       message << " version (>= #{major}.#{minor}.#{micro})"
     end
     major ||= 0
-    enough_version = checking_for(checking_message(message), "%s") do
+    result = checking_for(checking_message(message), "%s") do
       if check_version?(pkg, major, minor, micro)
         "yes (#{modversion(pkg)})"
       else
         "no"
       end
     end
+    enough_version = (result != "no")
     if enough_version
       libraries = libs_only_l(pkg)
       dldflags = libs(pkg)
