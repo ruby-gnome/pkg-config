@@ -1,5 +1,14 @@
 = NEWS
 
+== 1.5.1 - 2022-11-23
+
+=== Improvements
+
+  * Improved the default search path. "/usr" in "/usr/bin/pkg-config"
+    isn't used for buidling the default search path if "pkg-config
+    --variable=pc_path pkg-config" is available.
+    [Reported by Watson][GitHub:#22]
+
 == 1.5.0 - 2022-11-23
 
 === Improvements
