@@ -44,6 +44,11 @@ class PackageConfig
       @native_pkg_config_prefix ||= compute_native_pkg_config_prefix
     end
 
+    @default_path = nil
+    def default_path
+      @default_path ||= compute_default_path
+    end
+
     @custom_override_variables = nil
     def custom_override_variables
       @custom_override_variables ||= with_config("override-variables", "")
@@ -52,6 +57,7 @@ class PackageConfig
     def clear_configure_args_cache
       @native_pkg_config = nil
       @native_pkg_config_prefix = nil
+      @default_path = nil
       @custom_override_variables = nil
     end
 
@@ -138,6 +144,112 @@ class PackageConfig
         pkg_config_prefix
       end
     end
+
+    def compute_default_path
+      default_paths = nil
+      if native_pkg_config
+        pc_path = run_command(native_pkg_config.to_s,
+                              "--variable=pc_path",
+                              "pkg-config")
+        if pc_path
+          default_paths = pc_path.strip.split(SEPARATOR)
+          default_paths = nil if default_paths.empty?
+        end
+      end
+      if default_paths.nil?
+        arch_depended_path = Dir.glob("/usr/lib/*/pkgconfig")
+        default_paths = [
+          "/usr/local/lib64/pkgconfig",
+          "/usr/local/libx32/pkgconfig",
+          "/usr/local/lib/pkgconfig",
+          "/usr/local/libdata/pkgconfig",
+          "/usr/local/share/pkgconfig",
+          "/opt/local/lib/pkgconfig",
+          *arch_depended_path,
+          "/usr/lib64/pkgconfig",
+          "/usr/libx32/pkgconfig",
+          "/usr/lib/pkgconfig",
+          "/usr/libdata/pkgconfig",
+          "/usr/X11R6/lib/pkgconfig",
+          "/usr/X11R6/share/pkgconfig",
+          "/usr/X11/lib/pkgconfig",
+          "/opt/X11/lib/pkgconfig",
+          "/usr/share/pkgconfig",
+        ]
+      end
+      if Object.const_defined?(:RubyInstaller)
+        mingw_bin_path = RubyInstaller::Runtime.msys2_installation.mingw_bin_path
+        mingw_pkgconfig_path = Pathname.new(mingw_bin_path) + "../lib/pkgconfig"
+        default_paths.unshift(mingw_pkgconfig_path.cleanpath.to_s)
+      end
+      libdir = ENV["PKG_CONFIG_LIBDIR"]
+      default_paths.unshift(libdir) if libdir
+
+      paths = []
+      pkg_config_prefix = native_pkg_config_prefix
+      if pkg_config_prefix
+        pkg_config_arch_depended_paths =
+          Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
+        paths.concat(pkg_config_arch_depended_paths)
+        paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
+        paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
+        paths << (pkg_config_prefix + "lib/pkgconfig").to_s
+        paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+        paths << (pkg_config_prefix + "share/pkgconfig").to_s
+      end
+      if /-darwin\d[\d\.]*\z/ =~ RUBY_PLATFORM and
+        /\A(\d+\.\d+)/ =~ run_command("sw_vers", "-productVersion")
+        mac_os_version = $1
+        homebrew_repository_candidates = []
+        if pkg_config_prefix
+          brew_path = pkg_config_prefix + "bin" + "brew"
+          if brew_path.exist?
+            homebrew_repository = run_command(brew_path.to_s, "--repository")
+            if homebrew_repository
+              homebrew_repository_candidates <<
+                Pathname.new(homebrew_repository.strip)
+            end
+          else
+            homebrew_repository_candidates << pkg_config_prefix + "Homebrew"
+            homebrew_repository_candidates << pkg_config_prefix
+          end
+        end
+        brew = self.class.__send__(:search_executable_from_path, "brew")
+        if brew
+          homebrew_repository = run_command("brew", "--repository")
+          if homebrew_repository
+          homebrew_repository_candidates <<
+            Pathname(homebrew_repository.to_s)
+          end
+        end
+        homebrew_repository_candidates.uniq.each do |candidate|
+          pkgconfig_base_path = candidate + "Library/Homebrew/os/mac/pkgconfig"
+          path = pkgconfig_base_path + mac_os_version
+          unless path.exist?
+            path = pkgconfig_base_path + mac_os_version.gsub(/\.\d+\z/, "")
+          end
+          paths << path.to_s if path.exist?
+        end
+      end
+      paths.concat(default_paths)
+      paths.join(SEPARATOR)
+    end
+
+    def run_command(*command_line)
+      IO.pipe do |input, output|
+        begin
+          pid = spawn(*command_line,
+                      out: output,
+                      err: File::NULL)
+          output.close
+          _, status = Process.waitpid2(pid)
+          return nil unless status.success?
+          input.read
+        rescue SystemCallError
+          nil
+        end
+      end
+    end
   end
 
   attr_reader :name
@@ -155,7 +267,7 @@ class PackageConfig
     end
     @options = options
     path = @options[:path] || ENV["PKG_CONFIG_PATH"]
-    @paths = [path, guess_default_path].compact.join(SEPARATOR).split(SEPARATOR)
+    @paths = [path, self.class.default_path].compact.join(SEPARATOR).split(SEPARATOR)
     @paths.unshift(*(@options[:paths] || []))
     @paths = normalize_paths(@paths)
     @msvc_syntax = @options[:msvc_syntax]
@@ -423,79 +535,6 @@ class PackageConfig
     value.gsub(/\$\{(#{IDENTIFIER_RE})\}/) do
       variable($1)
     end
-  end
-
-  def guess_default_path
-    arch_depended_path = Dir.glob("/usr/lib/*/pkgconfig")
-    default_paths = [
-      "/usr/local/lib64/pkgconfig",
-      "/usr/local/libx32/pkgconfig",
-      "/usr/local/lib/pkgconfig",
-      "/usr/local/libdata/pkgconfig",
-      "/usr/local/share/pkgconfig",
-      "/opt/local/lib/pkgconfig",
-      *arch_depended_path,
-      "/usr/lib64/pkgconfig",
-      "/usr/libx32/pkgconfig",
-      "/usr/lib/pkgconfig",
-      "/usr/libdata/pkgconfig",
-      "/usr/X11R6/lib/pkgconfig",
-      "/usr/X11R6/share/pkgconfig",
-      "/usr/X11/lib/pkgconfig",
-      "/opt/X11/lib/pkgconfig",
-      "/usr/share/pkgconfig",
-    ]
-    if Object.const_defined?(:RubyInstaller)
-      mingw_bin_path = RubyInstaller::Runtime.msys2_installation.mingw_bin_path
-      mingw_pkgconfig_path = Pathname.new(mingw_bin_path) + "../lib/pkgconfig"
-      default_paths.unshift(mingw_pkgconfig_path.cleanpath.to_s)
-    end
-    libdir = ENV["PKG_CONFIG_LIBDIR"]
-    default_paths.unshift(libdir) if libdir
-
-    paths = []
-    pkg_config_prefix = self.class.native_pkg_config_prefix
-    if pkg_config_prefix
-      pkg_config_arch_depended_paths =
-        Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
-      paths.concat(pkg_config_arch_depended_paths)
-      paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
-      paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
-      paths << (pkg_config_prefix + "lib/pkgconfig").to_s
-      paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
-      paths << (pkg_config_prefix + "share/pkgconfig").to_s
-    end
-    if /-darwin\d[\d\.]*\z/ =~ RUBY_PLATFORM and
-        /\A(\d+\.\d+)/ =~ `sw_vers -productVersion`
-      mac_os_version = $1
-      homebrew_repository_candidates = []
-      if pkg_config_prefix
-        brew_path = pkg_config_prefix + "bin" + "brew"
-        if brew_path.exist?
-          escaped_brew_path = Shellwords.escape(brew_path.to_s)
-          homebrew_repository = `#{escaped_brew_path} --repository`.chomp
-          homebrew_repository_candidates << Pathname.new(homebrew_repository)
-        else
-          homebrew_repository_candidates << pkg_config_prefix + "Homebrew"
-          homebrew_repository_candidates << pkg_config_prefix
-        end
-      end
-      brew = self.class.__send__(:search_executable_from_path, "brew")
-      if brew
-        homebrew_repository = `brew --repository`.chomp
-        homebrew_repository_candidates << Pathname(homebrew_repository)
-      end
-      homebrew_repository_candidates.uniq.each do |candidate|
-        pkgconfig_base_path = candidate + "Library/Homebrew/os/mac/pkgconfig"
-        path = pkgconfig_base_path + mac_os_version
-        unless path.exist?
-          path = pkgconfig_base_path + mac_os_version.gsub(/\.\d+\z/, "")
-        end
-        paths << path.to_s if path.exist?
-      end
-    end
-    paths.concat(default_paths)
-    paths.join(SEPARATOR)
   end
 
   def required_packages
