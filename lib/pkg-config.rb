@@ -158,24 +158,34 @@ class PackageConfig
       end
       if default_paths.nil?
         arch_depended_path = Dir.glob("/usr/lib/*/pkgconfig")
-        default_paths = [
-          "/usr/local/lib64/pkgconfig",
-          "/usr/local/libx32/pkgconfig",
-          "/usr/local/lib/pkgconfig",
-          "/usr/local/libdata/pkgconfig",
-          "/usr/local/share/pkgconfig",
-          "/opt/local/lib/pkgconfig",
-          *arch_depended_path,
-          "/usr/lib64/pkgconfig",
-          "/usr/libx32/pkgconfig",
-          "/usr/lib/pkgconfig",
-          "/usr/libdata/pkgconfig",
-          "/usr/X11R6/lib/pkgconfig",
-          "/usr/X11R6/share/pkgconfig",
-          "/usr/X11/lib/pkgconfig",
-          "/opt/X11/lib/pkgconfig",
-          "/usr/share/pkgconfig",
-        ]
+        default_paths = []
+        pkg_config_prefix = native_pkg_config_prefix
+        if pkg_config_prefix
+          pkg_config_arch_depended_paths =
+            Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
+          default_paths.concat(pkg_config_arch_depended_paths)
+          default_paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
+          default_paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
+          default_paths << (pkg_config_prefix + "lib/pkgconfig").to_s
+          default_paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
+          default_paths << (pkg_config_prefix + "share/pkgconfig").to_s
+        end
+        default_paths << "/usr/local/lib64/pkgconfig"
+        default_paths << "/usr/local/libx32/pkgconfig"
+        default_paths << "/usr/local/lib/pkgconfig"
+        default_paths << "/usr/local/libdata/pkgconfig"
+        default_paths << "/usr/local/share/pkgconfig"
+        default_paths << "/opt/local/lib/pkgconfig"
+        default_paths.concat(arch_depended_path)
+        default_paths << "/usr/lib64/pkgconfig"
+        default_paths << "/usr/libx32/pkgconfig"
+        default_paths << "/usr/lib/pkgconfig"
+        default_paths << "/usr/libdata/pkgconfig"
+        default_paths << "/usr/X11R6/lib/pkgconfig"
+        default_paths << "/usr/X11R6/share/pkgconfig"
+        default_paths << "/usr/X11/lib/pkgconfig"
+        default_paths << "/opt/X11/lib/pkgconfig"
+        default_paths << "/usr/share/pkgconfig"
       end
       if Object.const_defined?(:RubyInstaller)
         mingw_bin_path = RubyInstaller::Runtime.msys2_installation.mingw_bin_path
@@ -186,17 +196,6 @@ class PackageConfig
       default_paths.unshift(libdir) if libdir
 
       paths = []
-      pkg_config_prefix = native_pkg_config_prefix
-      if pkg_config_prefix
-        pkg_config_arch_depended_paths =
-          Dir.glob((pkg_config_prefix + "lib/*/pkgconfig").to_s)
-        paths.concat(pkg_config_arch_depended_paths)
-        paths << (pkg_config_prefix + "lib64/pkgconfig").to_s
-        paths << (pkg_config_prefix + "libx32/pkgconfig").to_s
-        paths << (pkg_config_prefix + "lib/pkgconfig").to_s
-        paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
-        paths << (pkg_config_prefix + "share/pkgconfig").to_s
-      end
       if /-darwin\d[\d\.]*\z/ =~ RUBY_PLATFORM and
         /\A(\d+\.\d+)/ =~ run_command("sw_vers", "-productVersion")
         mac_os_version = $1
