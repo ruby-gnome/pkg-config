@@ -214,7 +214,7 @@ class PackageConfig
             homebrew_repository_candidates << pkg_config_prefix
           end
         end
-        brew = self.class.__send__(:search_executable_from_path, "brew")
+        brew = search_executable_from_path("brew")
         if brew
           homebrew_repository = run_command("brew", "--repository")
           if homebrew_repository
