@@ -1,5 +1,13 @@
 = NEWS
 
+== 1.5.0 - 2022-11-23
+
+=== Improvements
+
+  * Improved the default search path. "pkg-config --variable=pc_path
+    pkg-config" is used as the default search path if it's available.
+    [Reported by Watson][GitHub:#22]
+
 == 1.4.9 - 2022-07-31
 
 This is a bug fix release of 1.4.8. All 1.4.8 users should be upgraded
