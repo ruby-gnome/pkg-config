@@ -1,4 +1,4 @@
-# Copyright 2008-2022  Sutou Kouhei <kou@cozmixng.org>
+# Copyright 2008-2023  Sutou Kouhei <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -169,6 +169,10 @@ class PackageConfig
           default_paths << (pkg_config_prefix + "lib/pkgconfig").to_s
           default_paths << (pkg_config_prefix + "libdata/pkgconfig").to_s
           default_paths << (pkg_config_prefix + "share/pkgconfig").to_s
+        end
+        conda_prefix = ENV["CONDA_PREFIX"]
+        if conda_prefix
+          default_paths << File.join(conda_prefix, "lib", "pkgconfig")
         end
         default_paths << "/usr/local/lib64/pkgconfig"
         default_paths << "/usr/local/libx32/pkgconfig"
