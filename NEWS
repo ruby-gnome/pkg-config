@@ -1,5 +1,11 @@
 = NEWS
 
+== 1.5.2 - 2023-06-25
+
+=== Improvements
+
+  * Added support for conda.
+
 == 1.5.1 - 2022-11-23
 
 === Improvements
