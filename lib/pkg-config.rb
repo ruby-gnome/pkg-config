@@ -509,9 +509,9 @@ class PackageConfig
         line = line.gsub(/#.*/, "").strip
         next if line.empty?
         case line
-        when /^(#{IDENTIFIER_RE})=/
+        when /^(#{IDENTIFIER_RE})\s*=\s*/
           @variables[$1] = $POSTMATCH.strip
-        when /^(#{IDENTIFIER_RE}):/
+        when /^(#{IDENTIFIER_RE})\s*:\s*/
           @declarations[$1] = $POSTMATCH.strip
         end
       end
