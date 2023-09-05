@@ -1,5 +1,11 @@
 = NEWS
 
+== 1.5.5 - 2023-09-05
+
+=== Fixes
+
+  * Fixed a bug in 1.5.4 that success detection doesn't work.
+
 == 1.5.4 - 2023-09-05
 
 === Improvements
