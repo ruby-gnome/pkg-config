@@ -644,7 +644,11 @@ module PKGConfig
       if check_version?(pkg, major, minor, micro)
         "yes (#{modversion(pkg)})"
       else
-        "no"
+        if exist?(pkg)
+          "no (#{modversion(pkg)}"
+        else
+          "no (nonexistent)"
+        end
       end
     end
     enough_version = (result != "no")
