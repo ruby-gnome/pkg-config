@@ -651,7 +651,7 @@ module PKGConfig
         end
       end
     end
-    enough_version = (result != "no")
+    enough_version = result.start_with?("yes")
     if enough_version
       libraries = libs_only_l(pkg)
       dldflags = libs(pkg)
