@@ -233,9 +233,29 @@ class PkgConfigTest < Test::Unit::TestCase
       @cairo.__send__(:parse_requires, requires)
     end
 
-    def test_broken_version
+    def test_greater_than_or_equals_to_version
       assert_equal(["fribidi"],
                    parse_requires("fribidi >= fribidi_required_dep"))
+    end
+
+    def test_greater_than_version
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi > fribidi_required_dep"))
+    end
+
+    def test_less_than_or_equals_to_version
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi <= fribidi_required_dep"))
+    end
+
+    def test_less_than_version
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi < fribidi_required_dep"))
+    end
+
+    def test_equals_to_version
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi = fribidi_required_dep"))
     end
   end
 end
