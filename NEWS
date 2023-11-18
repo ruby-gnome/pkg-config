@@ -1,5 +1,19 @@
 = NEWS
 
+== 1.5.6 - 2023-11-19
+
+=== Improvements
+
+  * Added support for "<" and ">" operators in "Requires:".
+
+    GH-23
+
+    Patch by Daisuke Fujimura
+
+=== Thanks
+
+  * Daisuke Fujimura
+
 == 1.5.5 - 2023-09-05
 
 === Fixes
