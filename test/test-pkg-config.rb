@@ -237,5 +237,30 @@ class PkgConfigTest < Test::Unit::TestCase
       assert_equal(["fribidi"],
                    parse_requires("fribidi >= fribidi_required_dep"))
     end
+  
+    def test_greater_than_or_equals_to
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi >= 1.0"))
+    end
+
+    def test_greater_than
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi > 1.0"))
+    end
+
+    def test_less_than_or_equals_to
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi <= 1.0"))
+    end
+
+    def test_less_than
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi < 1.0"))
+    end
+
+    def test_equals_to
+      assert_equal(["fribidi"],
+                   parse_requires("fribidi = 1.0"))
+    end
   end
 end
