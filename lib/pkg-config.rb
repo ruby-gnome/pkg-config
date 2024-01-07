@@ -645,7 +645,7 @@ module PKGConfig
         "yes (#{modversion(pkg)})"
       else
         if exist?(pkg)
-          "no (#{modversion(pkg)}"
+          "no (#{modversion(pkg)})"
         else
           "no (nonexistent)"
         end
