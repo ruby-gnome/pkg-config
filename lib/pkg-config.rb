@@ -400,7 +400,7 @@ class PackageConfig
     target_packages.each do |package|
       cflags_set << package.declaration("Cflags")
     end
-    all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
+    all_cflags = Shellwords.split(cflags_set.join(" "))
     path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
     path_flags = normalize_path_flags(path_flags, "-I")
     path_flags = path_flags.reject do |flag|
@@ -429,23 +429,6 @@ class PackageConfig
       end
       "#{flag_option}#{path}"
     end
-  end
-
-  def normalize_cflags(cflags)
-    normalized_cflags = []
-    enumerator = cflags.to_enum
-    begin
-      loop do
-        cflag = enumerator.next
-        normalized_cflags << cflag
-        case cflag
-        when "-I"
-          normalized_cflags << enumerator.next
-        end
-      end
-    rescue StopIteration
-    end
-    normalized_cflags
   end
 
   def collect_libs
