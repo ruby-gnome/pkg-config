@@ -437,10 +437,10 @@ class PackageConfig
     begin
       loop do
         cflag = enumerator.next
-        normalized_cflags << cflag
+        normalized_cflags << cflag.dup
         case cflag
         when "-I"
-          normalized_cflags << enumerator.next
+          normalized_cflags.last << enumerator.next
         end
       end
     rescue StopIteration
