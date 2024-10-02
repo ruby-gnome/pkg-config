@@ -173,6 +173,7 @@ class PackageConfig
         conda_prefix = ENV["CONDA_PREFIX"]
         if conda_prefix
           default_paths << File.join(conda_prefix, "lib", "pkgconfig")
+          default_paths << File.join(conda_prefix, "share", "pkgconfig")
         end
         default_paths << "/usr/local/lib64/pkgconfig"
         default_paths << "/usr/local/libx32/pkgconfig"
