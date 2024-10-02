@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.summary = 'A pkg-config implementation for Ruby'
   spec.description = "pkg-config can be used in your extconf.rb to properly detect need libraries for compiling Ruby native extensions"
   spec.license = "LGPLv2+"
-  spec.files = ["README.rdoc", "NEWS", "Gemfile", "Rakefile", "LGPL-2.1"]
+  spec.files = ["README.rdoc", "NEWS.md", "Gemfile", "Rakefile", "LGPL-2.1"]
   spec.files += Dir.glob("lib/**/*.rb")
   spec.test_files = Dir.glob("test/**/*.rb")
 
