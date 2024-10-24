@@ -1,5 +1,23 @@
 # NEWS
 
+## 1.5.7 - 2024-10-24
+
+### Improvements
+
+  * conda: Added support for `${CONDA_PREFIX}/share/pkgconfig`.
+
+### Fixes
+
+  * Fixed `Cflags` nomralization
+
+    * GH-25
+
+    * Reported by Jean byroot Boussier
+
+### Thanks
+
+  * Jean byroot Boussier
+
 ## 1.5.6 - 2023-11-19
 
 ### Improvements
