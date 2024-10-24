@@ -35,7 +35,7 @@ jobs:
           tail -n +2 release-note.md > release-note-without-version.md
           gh release create \
             ${GITHUB_REF_NAME} \
-            --discussion-category Releases \
+            --discussion-category Announcements \
             --notes-file release-note-without-version.md \
             --title "${title}"
         env:
