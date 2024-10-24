@@ -3,7 +3,10 @@ name: Test
 on:
   push:
     branches:
-      - master
+      - '**'
+      - '!dependabot/**'
+    tags:
+      - '**'
   pull_request:
 
 jobs:
