@@ -35,3 +35,7 @@ desc "Run tests"
 task :test do
   ruby("test/run-test.rb")
 end
+
+release_task = Rake.application["release"]
+# We use Trusted Publishing.
+release_task.prerequisites.delete("release:rubygem_push")
