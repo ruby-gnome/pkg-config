@@ -1,5 +1,11 @@
 # NEWS
 
+## 1.5.8 - 2024-11-21
+
+### Improvements
+
+  * Added support for pkgconf.
+
 ## 1.5.7 - 2024-10-24
 
 ### Improvements
