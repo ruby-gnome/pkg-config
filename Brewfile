@@ -1,1 +1,2 @@
 brew "cairo"
+brew "pkgconf"

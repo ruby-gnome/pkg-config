@@ -72,18 +72,25 @@ class PackageConfig
 
     def guess_native_pkg_config
       exeext = RbConfig::CONFIG["EXEEXT"]
-      default_pkg_config = ENV["PKG_CONFIG"] || "pkg-config#{exeext}"
-      pkg_config = with_config("pkg-config", default_pkg_config)
-      pkg_config = Pathname.new(pkg_config)
-      unless pkg_config.absolute?
-        found_pkg_config = search_executable_from_path(pkg_config)
-        pkg_config = found_pkg_config if found_pkg_config
+      candidates = [
+        with_config("pkg-config"),
+        ENV["PKG_CONFIG"],
+        "pkgconf#{exeext}",
+        "pkg-config#{exeext}",
+      ].compact
+      candidates.each do |pkg_config|
+        pkg_config = Pathname.new(pkg_config)
+        return pkg_config if pkg_config.absolute? and pkg_config.exist?
+        unless pkg_config.absolute?
+          found_pkg_config = search_executable_from_path(pkg_config)
+          return found_pkg_config if found_pkg_config
+        end
+        unless pkg_config.absolute?
+          found_pkg_config = search_pkg_config_by_dln_find_exe(pkg_config)
+          return found_pkg_config if found_pkg_config
+        end
       end
-      unless pkg_config.absolute?
-        found_pkg_config = search_pkg_config_by_dln_find_exe(pkg_config)
-        pkg_config = found_pkg_config if found_pkg_config
-      end
-      pkg_config
+      Pathname.new(candidates[0])
     end
 
     def search_executable_from_path(name)
