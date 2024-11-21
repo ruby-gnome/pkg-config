@@ -2,7 +2,18 @@ require "mkmf"
 require "pkg-config"
 
 class PkgConfigTest < Test::Unit::TestCase
+  def find_program(name)
+    exeext = RbConfig::CONFIG["EXEEXT"]
+    ENV["PATH"].split(File::PATH_SEPARATOR).each do |path|
+      program = File.join(path, name)
+      return name if File.exist?(program)
+      return name if File.exist?("#{program}.#{exeext}")
+    end
+    nil
+  end
+
   def setup
+    @pkgconf = find_program("pkgconf") || "pkg-config"
     @custom_libdir = "/tmp/local/lib"
     options = {:override_variables => {"libdir" => @custom_libdir}}
     @cairo = PackageConfig.new("cairo", options)
@@ -10,17 +21,17 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def only_pkg_config_version(major, minor)
-    pkg_config_version = `pkg-config --version`.chomp
+    pkg_config_version = `#{@pkgconf} --version`.chomp
     current_major, current_minor = pkg_config_version.split(".").collect(&:to_i)
     return if ([major, minor] <=> [current_major, current_minor]) <= 0
-    omit("Require pkg-config #{pkg_config_version} or later")
+    omit("Require #{@pkgconf} #{pkg_config_version} or later")
   end
 
   def test_exist?
-    assert(system("pkg-config --exists cairo"))
+    assert(system("#{@pkgconf} --exists cairo"))
     assert(@cairo.exist?)
 
-    assert(system("pkg-config --exists cairo-png"))
+    assert(system("#{@pkgconf} --exists cairo-png"))
     assert(@cairo_png.exist?)
   end
 
@@ -177,7 +188,7 @@ class PkgConfigTest < Test::Unit::TestCase
   def pkg_config(package, *args)
     args.unshift("--define-variable=libdir=#{@custom_libdir}")
     args = args.collect {|arg| arg.dump}.join(" ")
-    normalize_pkg_config_result(`pkg-config #{args} #{package}`.strip)
+    normalize_pkg_config_result(`#{@pkgconf} #{args} #{package}`.strip)
   end
 
   def normalize_pkg_config_result(result)
