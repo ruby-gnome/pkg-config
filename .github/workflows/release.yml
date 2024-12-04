@@ -53,7 +53,8 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ruby
+          bundler-cache: true
       - uses: rubygems/configure-rubygems-credentials@v1.0.0
       - name: Push gems
         run: |
-          rake release:rubygem_push
+          bundle exec rake release:rubygem_push
