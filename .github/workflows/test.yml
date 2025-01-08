@@ -34,6 +34,12 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
       - name: Install system dependencies
         if: |
+          runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -V -y libcairo-dev
+      - name: Install system dependencies
+        if: |
           runner.os == 'macOS'
         run: |
           brew bundle
