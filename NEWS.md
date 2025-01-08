@@ -1,5 +1,11 @@
 # NEWS
 
+## 1.5.9 - 2025-01-08
+
+### Improvements
+
+  * Added support for `.pc` that uses UTF-8.
+
 ## 1.5.8 - 2024-11-21
 
 ### Improvements
