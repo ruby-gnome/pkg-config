@@ -514,6 +514,9 @@ class PackageConfig
     @declarations = {}
     File.open(pc_path) do |input|
       input.each_line do |line|
+        if line.dup.force_encoding("UTF-8").valid_encoding?
+          line.force_encoding("UTF-8")
+        end
         line = line.gsub(/#.*/, "").strip
         next if line.empty?
         case line
