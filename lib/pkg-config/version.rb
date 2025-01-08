@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2024  Sutou Kouhei <kou@cozmixng.org>
+# Copyright (C) 2012-2025  Sutou Kouhei <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,5 +15,5 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 module PKGConfig
-  VERSION = "1.5.9"
+  VERSION = "1.6.0"
 end
