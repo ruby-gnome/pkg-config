@@ -1,4 +1,4 @@
-# Copyright 2008-2023  Sutou Kouhei <kou@cozmixng.org>
+# Copyright (C) 2008-2025  Sutou Kouhei <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "English"
 require "pathname"
 require "rbconfig"
 require "shellwords"
@@ -633,9 +632,11 @@ class PackageConfig
         next if line.empty?
         case line
         when /^(#{IDENTIFIER_RE})\s*=\s*/
-          @variables[$1] = $POSTMATCH.strip
+          match = Regexp.last_match
+          @variables[match[1]] = match.post_match.strip
         when /^(#{IDENTIFIER_RE})\s*:\s*/
-          @declarations[$1] = $POSTMATCH.strip
+          match = Regexp.last_match
+          @declarations[match[1]] = match.post_match.strip
         end
       end
     end
