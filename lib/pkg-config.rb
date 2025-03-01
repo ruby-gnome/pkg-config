@@ -400,6 +400,14 @@ class PackageConfig
     @override_variables = default_override_variables.merge(@override_variables)
   end
 
+  def eql?(other)
+    other.is_a?(self.class) and @name == other.name
+  end
+
+  def hash
+    @name.hash
+  end
+
   def exist?
     not pc_path.nil?
   end
@@ -488,31 +496,25 @@ class PackageConfig
     @path_position
   end
 
-  def collect_requires(processed_packages={}, &block)
-    packages = []
-    unless processed_packages.key?(name)
-      targets = yield(self)
-      processed_packages[name] = self
+  def collect_requires(&block)
+    dependencies = {}
+    pending_packages = yield(self).collect {|name| self.class.new(name, @options)}
+    until pending_packages.empty?
+      package = pending_packages.shift
+      next if dependencies.key?(package)
+      dependencies[package] = true
+      targets = yield(package)
       targets.each do |name|
-        package = self.class.new(name, @options)
-        packages << package
-        packages.concat(package.collect_requires(processed_packages, &block))
+        require_package = self.class.new(name, @options)
+        pending_packages.push(require_package)
       end
     end
-    packages.uniq do |package|
-      package.name
-    end
+    dependencies.keys
   end
 
   private
-  def sort_packages(packages)
-    packages.sort_by.with_index do |package, i|
-      [package.path_position, i]
-    end
-  end
-
   def collect_cflags
-    target_packages = sort_packages([self, *all_required_packages])
+    target_packages = [self, *all_required_packages]
     cflags_set = []
     target_packages.each do |package|
       cflags_set << package.declaration("Cflags")
@@ -566,7 +568,7 @@ class PackageConfig
   end
 
   def collect_libs
-    target_packages = sort_packages(required_packages + [self])
+    target_packages = [*required_packages, self]
     libs_set = []
     target_packages.each do |package|
       libs_set << package.declaration("Libs")
