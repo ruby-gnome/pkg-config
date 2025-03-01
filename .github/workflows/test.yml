@@ -20,6 +20,7 @@ jobs:
 
   test:
     name: "Ruby ${{ matrix.ruby-version }}: ${{ matrix.runs-on }}"
+    needs: ruby-versions
     strategy:
       fail-fast: false
       matrix:
