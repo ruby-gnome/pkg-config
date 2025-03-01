@@ -434,26 +434,25 @@ class PackageConfig
   end
 
   def libs
-    path_flags, other_flags = collect_libs
-    (path_flags + other_flags).join(" ")
+    collect_libs.join(" ")
   end
 
   def libs_only_l
-    collect_libs[1].find_all do |arg|
+    collect_libs.find_all do |arg|
       if @msvc_syntax
-        /\.lib\z/ =~ arg
+        arg.end_with?(".lib")
       else
-        /\A-l/ =~ arg
+        arg.start_with?("-l")
       end
     end.join(" ")
   end
 
   def libs_only_L
-    collect_libs[0].find_all do |arg|
+    collect_libs.find_all do |arg|
       if @msvc_syntax
-        /\A\/libpath:/ =~ arg
+        arg.start_with?("/libpath:")
       else
-        /\A-L/ =~ arg
+        arg.start_with?("-L")
       end
     end.join(" ")
   end
@@ -521,7 +520,7 @@ class PackageConfig
     end
     all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
     path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
-    path_flags = normalize_path_flags(path_flags, "-I")
+    path_flags = path_flags.collect {|flag| normalize_path_flag(flag, "-I")}
     path_flags = path_flags.reject do |flag|
       flag == "-I/usr/include"
     end
@@ -534,20 +533,18 @@ class PackageConfig
     [path_flags, other_flags]
   end
 
-  def normalize_path_flags(path_flags, flag_option)
-    return path_flags unless /-mingw(?:32|-ucrt)\z/ === RUBY_PLATFORM
+  def normalize_path_flag(path_flag, flag_option)
+    return path_flag unless /-mingw(?:32|-ucrt)\z/ === RUBY_PLATFORM
 
     pkg_config_prefix = self.class.native_pkg_config_prefix
-    return path_flags unless pkg_config_prefix
+    return path_flag unless pkg_config_prefix
 
     mingw_dir = pkg_config_prefix.basename.to_s
-    path_flags.collect do |path_flag|
-      path = path_flag.sub(/\A#{Regexp.escape(flag_option)}/, "")
-      path = path.sub(/\A\/#{Regexp.escape(mingw_dir)}/i) do
-        pkg_config_prefix.to_s
-      end
-      "#{flag_option}#{path}"
+    path = path_flag.sub(/\A#{Regexp.escape(flag_option)}/, "")
+    path = path.sub(/\A\/#{Regexp.escape(mingw_dir)}/i) do
+      pkg_config_prefix.to_s
     end
+    "#{flag_option}#{path}"
   end
 
   def normalize_cflags(cflags)
@@ -573,26 +570,27 @@ class PackageConfig
     target_packages.each do |package|
       libs_set << package.declaration("Libs")
     end
-    all_flags = split_lib_flags(libs_set.join(" "))
-    path_flags, other_flags = all_flags.partition {|flag| /\A-L/ =~ flag}
-    path_flags = normalize_path_flags(path_flags, "-L")
-    path_flags = path_flags.reject do |flag|
+    flags = split_lib_flags(libs_set.join(" "))
+    flags = flags.collect do |flag|
+      flag = normalize_path_flag(flag, "-L") if flag.start_with?("-L")
+      flag
+    end
+    flags = flags.reject do |flag|
       /\A-L\/usr\/lib(?:64|x32)?\z/ =~ flag
     end
-    path_flags = path_flags.uniq
+    flags = flags.uniq
     if @msvc_syntax
-      path_flags = path_flags.collect do |flag|
-        flag.gsub(/\A-L/, "/libpath:")
-      end
-      other_flags = other_flags.collect do |flag|
-        if /\A-l/ =~ flag
-          "#{$POSTMATCH}.lib"
+      flags = flags.collect do |flag|
+        if flag.start_with?("-L")
+          flag.gsub(/\A-L/, "/libpath:")
+        elsif flag.start_with?("-l")
+          "#{flag[2..-1]}.lib"
         else
           flag
         end
       end
     end
-    [path_flags, other_flags]
+    flags
   end
 
   def split_lib_flags(libs_command_line)
