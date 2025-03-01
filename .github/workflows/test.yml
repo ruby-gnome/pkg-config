@@ -15,8 +15,6 @@ jobs:
     with:
       engine: cruby
       min_version: 2.6
-      versions: |
-        ["debug"]
 
   test:
     name: "Ruby ${{ matrix.ruby-version }}: ${{ matrix.runs-on }}"
