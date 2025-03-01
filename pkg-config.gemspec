@@ -16,11 +16,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require_relative "lib/pkg-config/version"
+pkg_config_content = File.read(File.join(__dir__, "lib/pkg-config.rb"))
+version = pkg_config_content[/^  VERSION = "(.+?)"/, 1]
 
 Gem::Specification.new do |spec|
   spec.name = "pkg-config"
-  spec.version = PKGConfig::VERSION
+  spec.version = version
   spec.homepage = "https://github.com/ruby-gnome/pkg-config"
   spec.authors = ["Sutou Kouhei"]
   spec.email = ["kou@cozmixng.org"]

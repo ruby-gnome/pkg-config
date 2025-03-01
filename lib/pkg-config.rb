@@ -14,15 +14,127 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-begin
-  require_relative "pkg-config/version"
-rescue LoadError
-end
-
 require "English"
 require "pathname"
 require "rbconfig"
 require "shellwords"
+
+module PKGConfig
+  VERSION = "1.6.0"
+
+  @@paths = []
+  @@override_variables = {}
+
+  module_function
+  def add_path(path)
+    @@paths << path
+  end
+
+  def set_override_variable(key, value)
+    @@override_variables[key] = value
+  end
+
+  def msvc?
+    /mswin/.match(RUBY_PLATFORM) and /^cl\b/.match(RbConfig::CONFIG["CC"])
+  end
+
+  def package_config(package)
+    PackageConfig.new(package,
+                      :msvc_syntax => msvc?,
+                      :override_variables => @@override_variables,
+                      :paths => @@paths)
+  end
+
+  def exist?(pkg)
+    package_config(pkg).exist?
+  end
+
+  def libs(pkg)
+    package_config(pkg).libs
+  end
+
+  def libs_only_l(pkg)
+    package_config(pkg).libs_only_l
+  end
+
+  def libs_only_L(pkg)
+    package_config(pkg).libs_only_L
+  end
+
+  def cflags(pkg)
+    package_config(pkg).cflags
+  end
+
+  def cflags_only_I(pkg)
+    package_config(pkg).cflags_only_I
+  end
+
+  def cflags_only_other(pkg)
+    package_config(pkg).cflags_only_other
+  end
+
+  def modversion(pkg)
+    package_config(pkg).version
+  end
+
+  def description(pkg)
+    package_config(pkg).description
+  end
+
+  def variable(pkg, name)
+    package_config(pkg).variable(name)
+  end
+
+  def check_version?(pkg, major=0, minor=0, micro=0)
+    return false unless exist?(pkg)
+    ver = modversion(pkg).split(".").collect {|item| item.to_i}
+    (0..2).each {|i| ver[i] = 0 unless ver[i]}
+
+    (ver[0] > major ||
+     (ver[0] == major && ver[1] > minor) ||
+     (ver[0] == major && ver[1] == minor &&
+      ver[2] >= micro))
+  end
+
+  def have_package(pkg, major=nil, minor=0, micro=0)
+    message = "#{pkg}"
+    unless major.nil?
+      message << " version (>= #{major}.#{minor}.#{micro})"
+    end
+    major ||= 0
+    result = checking_for(checking_message(message), "%s") do
+      if check_version?(pkg, major, minor, micro)
+        "yes (#{modversion(pkg)})"
+      else
+        if exist?(pkg)
+          "no (#{modversion(pkg)})"
+        else
+          "no (nonexistent)"
+        end
+      end
+    end
+    enough_version = result.start_with?("yes")
+    if enough_version
+      libraries = libs_only_l(pkg)
+      dldflags = libs(pkg)
+      dldflags = (Shellwords.shellwords(dldflags) -
+                  Shellwords.shellwords(libraries))
+      dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(" ")
+      $libs   += " " + libraries
+      if /mswin/ =~ RUBY_PLATFORM
+        $DLDFLAGS += " " + dldflags
+      else
+        $LDFLAGS += " " + dldflags
+      end
+      $CFLAGS += " " + cflags_only_other(pkg)
+      if defined?($CXXFLAGS)
+        $CXXFLAGS += " " + cflags_only_other(pkg)
+      end
+      $INCFLAGS += " " + cflags_only_I(pkg)
+    end
+    enough_version
+  end
+end
 
 class PackageConfig
   class Error < StandardError
@@ -567,120 +679,5 @@ class PackageConfig
     paths.reject do |path|
       path.empty? or !File.exist?(path)
     end
-  end
-end
-
-module PKGConfig
-  @@paths = []
-  @@override_variables = {}
-
-  module_function
-  def add_path(path)
-    @@paths << path
-  end
-
-  def set_override_variable(key, value)
-    @@override_variables[key] = value
-  end
-
-  def msvc?
-    /mswin/.match(RUBY_PLATFORM) and /^cl\b/.match(RbConfig::CONFIG["CC"])
-  end
-
-  def package_config(package)
-    PackageConfig.new(package,
-                      :msvc_syntax => msvc?,
-                      :override_variables => @@override_variables,
-                      :paths => @@paths)
-  end
-
-  def exist?(pkg)
-    package_config(pkg).exist?
-  end
-
-  def libs(pkg)
-    package_config(pkg).libs
-  end
-
-  def libs_only_l(pkg)
-    package_config(pkg).libs_only_l
-  end
-
-  def libs_only_L(pkg)
-    package_config(pkg).libs_only_L
-  end
-
-  def cflags(pkg)
-    package_config(pkg).cflags
-  end
-
-  def cflags_only_I(pkg)
-    package_config(pkg).cflags_only_I
-  end
-
-  def cflags_only_other(pkg)
-    package_config(pkg).cflags_only_other
-  end
-
-  def modversion(pkg)
-    package_config(pkg).version
-  end
-
-  def description(pkg)
-    package_config(pkg).description
-  end
-
-  def variable(pkg, name)
-    package_config(pkg).variable(name)
-  end
-
-  def check_version?(pkg, major=0, minor=0, micro=0)
-    return false unless exist?(pkg)
-    ver = modversion(pkg).split(".").collect {|item| item.to_i}
-    (0..2).each {|i| ver[i] = 0 unless ver[i]}
-
-    (ver[0] > major ||
-     (ver[0] == major && ver[1] > minor) ||
-     (ver[0] == major && ver[1] == minor &&
-      ver[2] >= micro))
-  end
-
-  def have_package(pkg, major=nil, minor=0, micro=0)
-    message = "#{pkg}"
-    unless major.nil?
-      message << " version (>= #{major}.#{minor}.#{micro})"
-    end
-    major ||= 0
-    result = checking_for(checking_message(message), "%s") do
-      if check_version?(pkg, major, minor, micro)
-        "yes (#{modversion(pkg)})"
-      else
-        if exist?(pkg)
-          "no (#{modversion(pkg)})"
-        else
-          "no (nonexistent)"
-        end
-      end
-    end
-    enough_version = result.start_with?("yes")
-    if enough_version
-      libraries = libs_only_l(pkg)
-      dldflags = libs(pkg)
-      dldflags = (Shellwords.shellwords(dldflags) -
-                  Shellwords.shellwords(libraries))
-      dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(" ")
-      $libs   += " " + libraries
-      if /mswin/ =~ RUBY_PLATFORM
-        $DLDFLAGS += " " + dldflags
-      else
-        $LDFLAGS += " " + dldflags
-      end
-      $CFLAGS += " " + cflags_only_other(pkg)
-      if defined?($CXXFLAGS)
-        $CXXFLAGS += " " + cflags_only_other(pkg)
-      end
-      $INCFLAGS += " " + cflags_only_I(pkg)
-    end
-    enough_version
   end
 end
