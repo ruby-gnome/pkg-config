@@ -96,7 +96,7 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs_msvc
     @glib.msvc_syntax = true
     result = pkg_config("glib-2.0", "--libs")
-    msvc_result = result.gsub(/-lglib-2.0\b/, "glib-2.0.lib")
+    msvc_result = result.gsub(/-l(glib-2\.0|intl)\b/, "\\1.lib")
     msvc_result = msvc_result.gsub(/-L/, "/libpath:")
     assert_not_equal(msvc_result, result)
     assert_equal(msvc_result, @glib.libs)
@@ -109,7 +109,7 @@ class PkgConfigTest < Test::Unit::TestCase
   def test_libs_only_l_msvc
     @glib.msvc_syntax = true
     result = pkg_config("glib-2.0", "--libs-only-l")
-    msvc_result = result.gsub(/-l(glib-2.0|z)\b/, "\\1.lib")
+    msvc_result = result.gsub(/-l(glib-2\.0|intl)\b/, "\\1.lib")
     assert_not_equal(msvc_result, result)
     assert_equal(msvc_result, @glib.libs_only_l)
   end
