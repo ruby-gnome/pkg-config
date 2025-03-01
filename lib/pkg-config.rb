@@ -490,18 +490,16 @@ class PackageConfig
 
   def collect_requires(processed_packages={}, &block)
     packages = []
-    targets = yield(self)
-    targets.each do |name|
-      next if processed_packages.key?(name)
-      package = self.class.new(name, @options)
-      processed_packages[name] = package
-      packages << package
-      packages.concat(package.collect_requires(processed_packages, &block))
+    unless processed_packages.key?(name)
+      targets = yield(self)
+      processed_packages[name] = self
+      targets.each do |name|
+        package = self.class.new(name, @options)
+        packages << package
+        packages.concat(package.collect_requires(processed_packages, &block))
+      end
     end
-    packages_without_self = packages.reject do |package|
-      package.name == @name
-    end
-    packages_without_self.uniq do |package|
+    packages.uniq do |package|
       package.name
     end
   end
