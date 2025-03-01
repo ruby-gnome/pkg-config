@@ -16,8 +16,7 @@ class PkgConfigTest < Test::Unit::TestCase
     @pkgconf = find_program("pkgconf") || "pkg-config"
     @custom_libdir = "/tmp/local/lib"
     options = {:override_variables => {"libdir" => @custom_libdir}}
-    @cairo = PackageConfig.new("cairo", options)
-    @cairo_png = PackageConfig.new("cairo-png", options)
+    @glib = PackageConfig.new("glib-2.0", options)
   end
 
   def only_pkg_config_version(major, minor)
@@ -28,29 +27,21 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_exist?
-    assert(system("#{@pkgconf} --exists cairo"))
-    assert(@cairo.exist?)
-
-    assert(system("#{@pkgconf} --exists cairo-png"))
-    assert(@cairo_png.exist?)
+    assert(system("#{@pkgconf} --exists glib-2.0"))
   end
 
   def test_cflags
     omit("Fragile on macOS") if RUBY_PLATFORM.include?("darwin")
-    assert_pkg_config("cairo", ["--cflags"], @cairo.cflags)
-    only_pkg_config_version(0, 29)
-    assert_pkg_config("cairo-png", ["--cflags"], @cairo_png.cflags)
+    assert_pkg_config("glib-2.0", ["--cflags"], @glib.cflags)
   end
 
   def test_cflags_only_I
     omit("Fragile on macOS") if RUBY_PLATFORM.include?("darwin")
-    assert_pkg_config("cairo", ["--cflags-only-I"], @cairo.cflags_only_I)
-    only_pkg_config_version(0, 29)
-    assert_pkg_config("cairo-png", ["--cflags-only-I"], @cairo_png.cflags_only_I)
+    assert_pkg_config("glib-2.0", ["--cflags-only-I"], @glib.cflags_only_I)
   end
 
   def split_lib_flags(libs_command_line)
-    @cairo.__send__(:split_lib_flags, libs_command_line)
+    @glib.__send__(:split_lib_flags, libs_command_line)
   end
 
   def test_split_libs
@@ -99,60 +90,57 @@ class PkgConfigTest < Test::Unit::TestCase
   end
 
   def test_libs
-    assert_pkg_config("cairo", ["--libs"], @cairo.libs)
-    assert_pkg_config("cairo-png", ["--libs"], @cairo_png.libs)
+    assert_pkg_config("glib-2.0", ["--libs"], @glib.libs)
   end
 
   def test_libs_msvc
-    @cairo.msvc_syntax = true
-    result = pkg_config("cairo", "--libs")
-    msvc_result = result.gsub(/-lcairo\b/, "cairo.lib")
+    @glib.msvc_syntax = true
+    result = pkg_config("glib-2.0", "--libs")
+    msvc_result = result.gsub(/-lglib-2.0\b/, "glib-2.0.lib")
     msvc_result = msvc_result.gsub(/-L/, "/libpath:")
     assert_not_equal(msvc_result, result)
-    assert_equal(msvc_result, @cairo.libs)
+    assert_equal(msvc_result, @glib.libs)
   end
 
   def test_libs_only_l
-    assert_pkg_config("cairo", ["--libs-only-l"], @cairo.libs_only_l)
-    assert_pkg_config("cairo-png", ["--libs-only-l"], @cairo_png.libs_only_l)
+    assert_pkg_config("glib-2.0", ["--libs-only-l"], @glib.libs_only_l)
   end
 
   def test_libs_only_l_msvc
-    @cairo_png.msvc_syntax = true
-    result = pkg_config("cairo-png", "--libs-only-l")
-    msvc_result = result.gsub(/-l(cairo|png[0-9]+|z)\b/, "\\1.lib")
+    @glib.msvc_syntax = true
+    result = pkg_config("glib-2.0", "--libs-only-l")
+    msvc_result = result.gsub(/-l(glib-2.0|z)\b/, "\\1.lib")
     assert_not_equal(msvc_result, result)
-    assert_equal(msvc_result, @cairo_png.libs_only_l)
+    assert_equal(msvc_result, @glib.libs_only_l)
   end
 
   def test_libs_only_L
-    assert_pkg_config("cairo", ["--libs-only-L"], @cairo.libs_only_L)
-    assert_pkg_config("cairo-png", ["--libs-only-L"], @cairo_png.libs_only_L)
+    assert_pkg_config("glib-2.0", ["--libs-only-L"], @glib.libs_only_L)
   end
 
   def test_libs_only_L_msvc
-    @cairo_png.msvc_syntax = true
-    result = pkg_config("cairo-png", "--libs-only-L")
+    @glib.msvc_syntax = true
+    result = pkg_config("glib-2.0", "--libs-only-L")
     msvc_result = result.gsub(/-L/, "/libpath:")
     assert_not_equal(msvc_result, result)
-    assert_equal(msvc_result, @cairo_png.libs_only_L)
+    assert_equal(msvc_result, @glib.libs_only_L)
   end
 
   def test_requires
-    assert_equal([], @cairo.requires)
+    assert_equal([], @glib.requires)
   end
 
   def test_requires_private
-    requires_private = pkg_config("cairo", "--print-requires-private")
+    requires_private = pkg_config("glib-2.0", "--print-requires-private")
     expected_requires = requires_private.split(/\n/).collect do |require|
       require.split(/\s/, 2)[0]
     end
     assert_equal(expected_requires,
-                 @cairo.requires_private)
+                 @glib.requires_private)
   end
 
   def test_version
-    assert_pkg_config("cairo", ["--modversion"], @cairo.version)
+    assert_pkg_config("glib-2.0", ["--modversion"], @glib.version)
   end
 
   def test_parse_override_variables
@@ -169,11 +157,11 @@ class PkgConfigTest < Test::Unit::TestCase
 
   def test_override_variables
     overridden_prefix = "c:\\\\gtk-dev"
-    original_prefix = @cairo.variable("prefix")
+    original_prefix = @glib.variable("prefix")
     assert_not_equal(overridden_prefix, original_prefix)
     with_override_variables("prefix=#{overridden_prefix}") do
-      cairo = PackageConfig.new("cairo")
-      assert_equal(overridden_prefix, cairo.variable("prefix"))
+      glib = PackageConfig.new("glib-2.0")
+      assert_equal(overridden_prefix, glib.variable("prefix"))
     end
   end
 
@@ -214,8 +202,8 @@ class PkgConfigTest < Test::Unit::TestCase
 
   def assert_override_variables(expected, override_variables)
     with_override_variables(override_variables) do
-      cairo = PackageConfig.new("cairo")
-      assert_equal(expected, cairo.instance_variable_get("@override_variables"))
+      glib = PackageConfig.new("glib-2.0")
+      assert_equal(expected, glib.instance_variable_get("@override_variables"))
     end
   end
 
@@ -241,14 +229,14 @@ class PkgConfigTest < Test::Unit::TestCase
 
   sub_test_case("#parse_requires") do
     def parse_requires(requires)
-      @cairo.__send__(:parse_requires, requires)
+      @glib.__send__(:parse_requires, requires)
     end
 
     def test_broken_version
       assert_equal(["fribidi"],
                    parse_requires("fribidi >= fribidi_required_dep"))
     end
-  
+
     def test_greater_than_or_equals_to
       assert_equal(["fribidi"],
                    parse_requires("fribidi >= 1.0"))
