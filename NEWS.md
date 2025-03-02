@@ -1,5 +1,13 @@
 # NEWS
 
+## 1.6.0 - 2025-03-02
+
+### Improvements
+
+  * Changed to use only one file: `pkg-config.rb`
+
+  * Removed `English` dependency.
+
 ## 1.5.9 - 2025-01-08
 
 ### Improvements
