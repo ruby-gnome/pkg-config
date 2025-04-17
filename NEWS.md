@@ -1,5 +1,17 @@
 # NEWS
 
+## 1.6.1 - 2025-04-17
+
+### Improvements
+
+  * Added support for `--with-pkg-config-path`.
+    * [ruby-gnome/ruby-gnome#1670](https://github.com/ruby-gnome/ruby-gnome/issues/1670)
+    * Reported by Stanisław Pitucha
+
+### Thanks
+
+  * Stanisław Pitucha
+
 ## 1.6.0 - 2025-03-02
 
 ### Improvements
