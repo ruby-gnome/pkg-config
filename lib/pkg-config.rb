@@ -354,7 +354,10 @@ class PackageConfig
         end
       end
       paths.concat(default_paths)
-      paths.join(SEPARATOR)
+      [
+        with_config("pkg-config-path") || ENV["PKG_CONFIG_PATH"],
+        *paths,
+      ].compact.join(SEPARATOR)
     end
 
     def run_command(*command_line)
@@ -388,8 +391,10 @@ class PackageConfig
       @name = name
     end
     @options = options
-    path = @options[:path] || ENV["PKG_CONFIG_PATH"]
-    @paths = [path, self.class.default_path].compact.join(SEPARATOR).split(SEPARATOR)
+    @paths = [
+      @options[:path],
+      self.class.default_path,
+    ].compact.join(SEPARATOR).split(SEPARATOR)
     @paths.unshift(*(@options[:paths] || []))
     @paths = normalize_paths(@paths)
     @msvc_syntax = @options[:msvc_syntax]
