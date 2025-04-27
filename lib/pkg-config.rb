@@ -340,17 +340,22 @@ class PackageConfig
         if brew
           homebrew_repository = run_command("brew", "--repository")
           if homebrew_repository
-          homebrew_repository_candidates <<
-            Pathname(homebrew_repository.to_s)
+            homebrew_repository_candidates <<
+              Pathname(homebrew_repository.strip)
           end
         end
         homebrew_repository_candidates.uniq.each do |candidate|
-          pkgconfig_base_path = candidate + "Library/Homebrew/os/mac/pkgconfig"
-          path = pkgconfig_base_path + mac_os_version
-          unless path.exist?
-            path = pkgconfig_base_path + mac_os_version.gsub(/\.\d+\z/, "")
+          mac_pkgconfig_base_path =
+            candidate + "Library/Homebrew/os/mac/pkgconfig"
+          mac_pkgconfig_path = mac_pkgconfig_base_path + mac_os_version
+          unless mac_pkgconfig_path.exist?
+            mac_pkgconfig_path =
+              mac_pkgconfig_base_path + mac_os_version.gsub(/\.\d+\z/, "")
           end
-          paths << path.to_s if path.exist?
+          paths << mac_pkgconfig_path.to_s if mac_pkgconfig_path.exist?
+
+          pkgconfig_path = candidate + "lib/pkgconfig"
+          paths << pkgconfig_path.to_s if pkgconfig_path.exist?
         end
       end
       paths.concat(default_paths)
