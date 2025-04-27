@@ -1,5 +1,18 @@
 # NEWS
 
+## 1.6.2 - 2025-04-27
+
+### Improvements
+
+  * Added support for detecting Homebrew's pkgconfig path without
+    `pkgconf`.
+    * [apche/arrow#46235](https://github.com/apache/arrow/issues/46245)
+    * Reported by Shizuo Fujita
+
+### Thanks
+
+  * Shizuo Fujita
+
 ## 1.6.1 - 2025-04-17
 
 ### Improvements
