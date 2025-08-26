@@ -1,5 +1,18 @@
 # NEWS
 
+## 1.6.3 - 2025-08-27
+
+### Improvements
+
+  * Added support for detecting Homebrew's pkgconfig path by `brew
+    --path`.
+    * [ruby-gnome/pkg-config#36](https://github.com/ruby-gnome/pkg-config/issues/36)
+    * Patch by meredith
+
+### Thanks
+
+  * meredith
+
 ## 1.6.2 - 2025-04-27
 
 ### Improvements
