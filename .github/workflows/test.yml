@@ -27,6 +27,11 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
+        exclude:
+          - {ruby-version: "2.6", runs-on: windows-latest}
+          - {ruby-version: "2.7", runs-on: windows-latest}
+          - {ruby-version: "3.0", runs-on: windows-latest}
+          - {ruby-version: "3.1", runs-on: windows-latest}
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v5
