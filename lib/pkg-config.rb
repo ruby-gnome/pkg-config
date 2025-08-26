@@ -343,6 +343,11 @@ class PackageConfig
             homebrew_repository_candidates <<
               Pathname(homebrew_repository.strip)
           end
+          homebrew_prefix = run_command("brew", "--prefix")
+          if homebrew_prefix
+            homebrew_repository_candidates <<
+              Pathname(homebrew_prefix.strip)
+          end
         end
         homebrew_repository_candidates.uniq.each do |candidate|
           mac_pkgconfig_base_path =
