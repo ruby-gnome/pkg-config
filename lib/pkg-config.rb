@@ -637,13 +637,18 @@ class PackageConfig
     @variables = {}
     @declarations = {}
     File.open(pc_path) do |input|
+      current_line = +""
       input.each_line do |line|
         if line.dup.force_encoding("UTF-8").valid_encoding?
           line.force_encoding("UTF-8")
         end
         line = line.gsub(/#.*/, "").strip
-        next if line.empty?
-        case line
+        if line.end_with?("\\")
+          current_line += line[0..-2]
+          next
+        end
+        current_line += line
+        case current_line
         when /^(#{IDENTIFIER_RE})\s*=\s*/
           match = Regexp.last_match
           @variables[match[1]] = match.post_match.strip
@@ -651,6 +656,7 @@ class PackageConfig
           match = Regexp.last_match
           @declarations[match[1]] = match.post_match.strip
         end
+        current_line = +""
       end
     end
   end

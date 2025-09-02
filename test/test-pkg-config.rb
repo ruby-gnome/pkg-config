@@ -1,4 +1,6 @@
 require "mkmf"
+require "tempfile"
+
 require "pkg-config"
 
 class PkgConfigTest < Test::Unit::TestCase
@@ -225,6 +227,56 @@ class PkgConfigTest < Test::Unit::TestCase
     yield
   ensure
     $configure_args = original_configure_args
+  end
+
+  sub_test_case("#parse_pc") do
+    def parse_pc(content)
+      Tempfile.create(["pkg-config", ".pc"]) do |file|
+        file.puts(content)
+        file.close
+        package_config = PackageConfig.new(file.path)
+        package_config.__send__(:parse_pc)
+        [
+          package_config.instance_variable_get(:@variables),
+          package_config.instance_variable_get(:@declarations),
+        ]
+      end
+    end
+
+    def test_continuous_line
+      assert_equal([
+                     {
+                       "prefix" => "/usr/local",
+                       "libdir" => "/usr/local/lib",
+                       "includedir" => "/usr/local/include",
+                     },
+                     {
+                       "Name" => "my-package",
+                       "Description" => "This is my package",
+                       "Version" => "1.0.0",
+                       "Requires" => "glib-2.0 >= 2.72 gobject-2.0 >= 2.72",
+                       "Requires.private" => "gio-2.0 >= 2.72 " +
+                                             "                  cairo",
+                       "Libs" => "-L${libdir} -lmy-package",
+                       "Cflags" => "-I${includedir}/my-package",
+                     },
+                   ],
+                   parse_pc(<<-PC))
+prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: my-package
+Description: This is my package
+Version: 1.0.0
+Requires: glib-2.0 >= 2.72 gobject-2.0 >= 2.72
+Requires.private: gio-2.0 >= 2.72 \
+                  cairo
+
+Libs: -L${libdir} -lmy-package
+Cflags: -I${includedir}/my-package
+      PC
+    end
   end
 
   sub_test_case("#parse_requires") do
