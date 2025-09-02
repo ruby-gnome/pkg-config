@@ -1,5 +1,17 @@
 # NEWS
 
+## 1.6.4 - 2025-09-03
+
+### Improvements
+
+  * Added support for continuous line.
+    * [ruby-gnome/ruby-gnome#1686](https://github.com/ruby-gnome/ruby-gnome/issues/1686)
+    * Reported by Vincent Garrigues
+
+### Thanks
+
+  * Vincent Garrigues
+
 ## 1.6.3 - 2025-08-27
 
 ### Improvements
