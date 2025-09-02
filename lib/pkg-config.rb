@@ -19,7 +19,7 @@ require "rbconfig"
 require "shellwords"
 
 module PKGConfig
-  VERSION = "1.6.4"
+  VERSION = "1.6.5"
 
   @@paths = []
   @@override_variables = {}
