@@ -37,56 +37,58 @@ module PKGConfig
     /mswin/.match(RUBY_PLATFORM) and /^cl\b/.match(RbConfig::CONFIG["CC"])
   end
 
-  def package_config(package)
+  def package_config(package, **options)
     PackageConfig.new(package,
-                      :msvc_syntax => msvc?,
-                      :override_variables => @@override_variables,
-                      :paths => @@paths)
+                      {
+                        msvc_syntax: msvc?,
+                        override_variables: @@override_variables,
+                        paths: @@paths,
+                      }.merge(options))
   end
 
-  def exist?(pkg)
-    package_config(pkg).exist?
+  def exist?(pkg, **options)
+    package_config(pkg, **options).exist?
   end
 
-  def libs(pkg)
-    package_config(pkg).libs
+  def libs(pkg, **options)
+    package_config(pkg, **options).libs
   end
 
-  def libs_only_l(pkg)
-    package_config(pkg).libs_only_l
+  def libs_only_l(pkg, **options)
+    package_config(pkg, **options).libs_only_l
   end
 
-  def libs_only_L(pkg)
-    package_config(pkg).libs_only_L
+  def libs_only_L(pkg, **options)
+    package_config(pkg, **options).libs_only_L
   end
 
-  def cflags(pkg)
-    package_config(pkg).cflags
+  def cflags(pkg, **options)
+    package_config(pkg, **options).cflags
   end
 
-  def cflags_only_I(pkg)
-    package_config(pkg).cflags_only_I
+  def cflags_only_I(pkg, **options)
+    package_config(pkg, **options).cflags_only_I
   end
 
-  def cflags_only_other(pkg)
-    package_config(pkg).cflags_only_other
+  def cflags_only_other(pkg, **options)
+    package_config(pkg, **options).cflags_only_other
   end
 
-  def modversion(pkg)
-    package_config(pkg).version
+  def modversion(pkg, **options)
+    package_config(pkg, **options).version
   end
 
-  def description(pkg)
-    package_config(pkg).description
+  def description(pkg, **options)
+    package_config(pkg, **options).description
   end
 
-  def variable(pkg, name)
-    package_config(pkg).variable(name)
+  def variable(pkg, name, **options)
+    package_config(pkg, **options).variable(name)
   end
 
-  def check_version?(pkg, major=0, minor=0, micro=0)
-    return false unless exist?(pkg)
-    ver = modversion(pkg).split(".").collect {|item| item.to_i}
+  def check_version?(pkg, major=0, minor=0, micro=0, **options)
+    return false unless exist?(pkg, **options)
+    ver = modversion(pkg, **options).split(".").collect {|item| item.to_i}
     (0..2).each {|i| ver[i] = 0 unless ver[i]}
 
     (ver[0] > major ||
@@ -95,18 +97,18 @@ module PKGConfig
       ver[2] >= micro))
   end
 
-  def have_package(pkg, major=nil, minor=0, micro=0)
+  def have_package(pkg, major=nil, minor=0, micro=0, **options)
     message = "#{pkg}"
     unless major.nil?
       message << " version (>= #{major}.#{minor}.#{micro})"
     end
     major ||= 0
     result = checking_for(checking_message(message), "%s") do
-      if check_version?(pkg, major, minor, micro)
-        "yes (#{modversion(pkg)})"
+      if check_version?(pkg, major, minor, micro, **options)
+        "yes (#{modversion(pkg, **options)})"
       else
-        if exist?(pkg)
-          "no (#{modversion(pkg)})"
+        if exist?(pkg, **options)
+          "no (#{modversion(pkg, **options)})"
         else
           "no (nonexistent)"
         end
@@ -114,8 +116,8 @@ module PKGConfig
     end
     enough_version = result.start_with?("yes")
     if enough_version
-      libraries = libs_only_l(pkg)
-      dldflags = libs(pkg)
+      libraries = libs_only_l(pkg, **options)
+      dldflags = libs(pkg, **options)
       dldflags = (Shellwords.shellwords(dldflags) -
                   Shellwords.shellwords(libraries))
       dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(" ")
@@ -125,11 +127,11 @@ module PKGConfig
       else
         $LDFLAGS += " " + dldflags
       end
-      $CFLAGS += " " + cflags_only_other(pkg)
+      $CFLAGS += " " + cflags_only_other(pkg, **options)
       if defined?($CXXFLAGS)
-        $CXXFLAGS += " " + cflags_only_other(pkg)
+        $CXXFLAGS += " " + cflags_only_other(pkg, **options)
       end
-      $INCFLAGS += " " + cflags_only_I(pkg)
+      $INCFLAGS += " " + cflags_only_I(pkg, **options)
     end
     enough_version
   end
@@ -408,6 +410,7 @@ class PackageConfig
     @paths.unshift(*(@options[:paths] || []))
     @paths = normalize_paths(@paths)
     @msvc_syntax = @options[:msvc_syntax]
+    @static = @options[:static]
     @variables = @declarations = nil
     override_variables = self.class.custom_override_variables
     @override_variables = parse_override_variables(override_variables)
@@ -528,7 +531,12 @@ class PackageConfig
 
   private
   def collect_cflags
-    target_packages = [self, *all_required_packages]
+    target_packages = [self]
+    if @static
+      target_packages += all_required_packages
+    else
+      target_packages += required_packages
+    end
     cflags_set = []
     target_packages.each do |package|
       cflags_set << package.declaration("Cflags")
@@ -580,7 +588,12 @@ class PackageConfig
   end
 
   def collect_libs
-    target_packages = [*required_packages, self]
+    if @static
+      target_packages = all_required_packages
+    else
+      target_packages = required_packages
+    end
+    target_packages += [self]
     libs_set = []
     target_packages.each do |package|
       libs_set << package.declaration("Libs")

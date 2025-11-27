@@ -1,5 +1,6 @@
 require "mkmf"
 require "tempfile"
+require "fileutils"
 
 require "pkg-config"
 
@@ -312,6 +313,86 @@ Cflags: -I${includedir}/my-package
     def test_equals_to
       assert_equal(["fribidi"],
                    parse_requires("fribidi = 1.0"))
+    end
+  end
+
+  sub_test_case("static option") do
+    def create_pc_file(name, content)
+      pc_dir = File.join(@tmpdir, "pkgconfig")
+      FileUtils.mkdir_p(pc_dir)
+      pc_path = File.join(pc_dir, "#{name}.pc")
+      File.write(pc_path, content)
+      pc_dir
+    end
+
+    def setup
+      PackageConfig.clear_configure_args_cache
+      @tmpdir = Dir.mktmpdir
+      @pc_dir = create_pc_file("main-package", <<-PC)
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: main-package
+Description: Main package for testing
+Version: 1.0.0
+Requires: dep-package
+Requires.private: private-dep-package
+Libs: -L${libdir} -lmain
+Cflags: -I${includedir}/main
+      PC
+      create_pc_file("dep-package", <<-PC)
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: dep-package
+Description: Dependency package
+Version: 1.0.0
+Libs: -L${libdir} -ldep
+Cflags: -I${includedir}/dep
+      PC
+      create_pc_file("private-dep-package", <<-PC)
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: private-dep-package
+Description: Private dependency package
+Version: 1.0.0
+Libs: -L${libdir} -lprivate-dep
+Cflags: -I${includedir}/private-dep
+      PC
+    end
+
+    def teardown
+      FileUtils.rm_rf(@tmpdir)
+    end
+
+    def test_cflags_without_static
+      package = PackageConfig.new("main-package", paths: [@pc_dir])
+      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep",
+                   package.cflags)
+    end
+
+    def test_cflags_with_static
+      package = PackageConfig.new("main-package", paths: [@pc_dir], static: true)
+      assert_equal("-I/usr/local/include/main " +
+                   "-I/usr/local/include/private-dep " +
+                   "-I/usr/local/include/dep",
+                   package.cflags)
+    end
+
+    def test_libs_without_static
+      package = PackageConfig.new("main-package", paths: [@pc_dir])
+      assert_equal("-L/usr/local/lib -ldep -lmain",
+                   package.libs)
+    end
+
+    def test_libs_with_static
+      package = PackageConfig.new("main-package", paths: [@pc_dir], static: true)
+      assert_equal("-L/usr/local/lib -lprivate-dep -ldep -lmain",
+                   package.libs)
     end
   end
 end
