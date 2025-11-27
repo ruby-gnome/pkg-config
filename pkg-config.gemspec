@@ -32,5 +32,7 @@ Gem::Specification.new do |spec|
   spec.files += Dir.glob("lib/**/*.rb")
   spec.test_files = Dir.glob("test/**/*.rb")
 
+  spec.requirements << "system: pkgconf: msys2: pkgconf"
+
   spec.metadata["msys2_mingw_dependencies"] = "pkgconf"
 end
