@@ -57,6 +57,27 @@ jobs:
       - name: Install dependencies
         run: |
           bundle install
+      - name: Debug pkg-config (Windows)
+        if: |
+          runner.os == 'Windows'
+        run: |
+          echo "=== PATH ==="
+          echo $env:Path
+          echo ""
+          echo "=== which pkgconf ==="
+          Get-Command pkgconf -ErrorAction SilentlyContinue
+          echo ""
+          echo "=== which pkg-config ==="
+          Get-Command pkg-config -ErrorAction SilentlyContinue
+          echo ""
+          echo "=== ridk exec which pkgconf ==="
+          ridk exec which pkgconf
+          echo ""
+          echo "=== ridk exec pkgconf --version ==="
+          ridk exec pkgconf --version
+          echo ""
+          echo "=== ridk exec pkgconf --cflags glib-2.0 ==="
+          ridk exec pkgconf --cflags glib-2.0
       - name: Test
         run: |
           bundle exec rake
