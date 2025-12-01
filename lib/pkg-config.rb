@@ -545,6 +545,7 @@ class PackageConfig
         flag.gsub(/\A-I/, "/I")
       end
     end
+    other_flags = merge_back_cflags(other_flags)
     [path_flags, other_flags]
   end
 
@@ -577,6 +578,32 @@ class PackageConfig
     rescue StopIteration
     end
     normalized_cflags
+  end
+
+  # Implementing behavior compatible with pkgconf's pkgconf_fragment_copy().
+  # This is not a complete reproduction yet, but the goal is to stay compatible.
+  # https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/libpkgconf/fragment.c#L381-L416
+  def merge_back_cflags(cflags)
+    merge_backed_cflags = []
+    cflags.each do |cflag|
+      if mergeable_flag?(cflag)
+        # NOTE: This may be slow because this checks merge_back_cflags N times
+        # (where N is the number of mergeable flags).
+        merge_backed_cflags.delete(cflag)
+      end
+      merge_backed_cflags << cflag
+    end
+    merge_backed_cflags
+  end
+
+  def mergeable_flag?(flag)
+    return false unless flag.start_with?("-")
+    return true if flag.start_with?("-D")
+    if flag.start_with?("-W")
+      return false if flag.start_with?("-Wa,", "-Wl,", "-Wp,")
+      return true
+    end
+    false
   end
 
   def collect_libs
