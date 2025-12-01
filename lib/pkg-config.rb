@@ -584,16 +584,16 @@ class PackageConfig
   # This is not a complete reproduction yet, but the goal is to stay compatible.
   # https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/libpkgconf/fragment.c#L381-L416
   def merge_back_cflags(cflags)
-    mergebacked_cflags = []
+    merge_backed_cflags = []
     cflags.each do |cflag|
       if mergeable_flag?(cflag)
         # NOTE: This may be slow because this checks merge_back_cflags N times
         # (where N is the number of mergeable flags).
-        mergebacked_cflags.delete(cflag)
+        merge_backed_cflags.delete(cflag)
       end
-      mergebacked_cflags << cflag
+      merge_backed_cflags << cflag
     end
-    mergebacked_cflags
+    merge_backed_cflags
   end
 
   def mergeable_flag?(flag)
