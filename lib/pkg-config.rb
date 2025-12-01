@@ -583,6 +583,9 @@ class PackageConfig
   # Implementing behavior compatible with pkgconf's pkgconf_fragment_copy().
   # This is not a complete reproduction yet, but the goal is to stay compatible.
   # https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/libpkgconf/fragment.c#L381-L416
+  #
+  # NOTE: This may be slow because this checks mergebacked_flags N times (where
+  # N is the number of mergeable flags).
   def mergeback_flags(flags)
     mergebacked_flags = []
     flags.each do |flag|
