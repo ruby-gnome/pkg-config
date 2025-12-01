@@ -1,5 +1,17 @@
 # NEWS
 
+## 1.6.5 - 2025-12-01
+
+### Improvements
+
+  * Improved pkgconf compatibility: Removed duplicated `-D`/`-W` flags.
+    * [ruby-gnome/pkg-config#43](https://github.com/ruby-gnome/pkg-config/issues/43)
+    * Patch by takuya kodama
+
+### Thanks
+
+  * takuya kodama
+
 ## 1.6.4 - 2025-09-03
 
 ### Improvements
