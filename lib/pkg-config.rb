@@ -534,7 +534,7 @@ class PackageConfig
       cflags_set << package.declaration("Cflags")
     end
     all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
-    path_flags, cflags = all_cflags.partition {|flag| /\A-I/ =~ flag}
+    path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
     path_flags = path_flags.collect {|flag| normalize_path_flag(flag, "-I")}
     path_flags = path_flags.reject do |flag|
       flag == "-I/usr/include"
@@ -545,8 +545,8 @@ class PackageConfig
         flag.gsub(/\A-I/, "/I")
       end
     end
-    cflags = merge_back_cflags(cflags)
-    [path_flags, cflags]
+    other_flags = merge_back_cflags(other_flags)
+    [path_flags, other_flags]
   end
 
   def normalize_path_flag(path_flag, flag_option)
