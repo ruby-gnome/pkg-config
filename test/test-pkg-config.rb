@@ -314,4 +314,127 @@ Cflags: -I${includedir}/my-package
                    parse_requires("fribidi = 1.0"))
     end
   end
+
+  sub_test_case("cflags mergeback") do
+    def create_pc_file(name, content)
+      pc_dir = File.join(@tmpdir, "pkgconfig")
+      FileUtils.mkdir_p(pc_dir)
+      pc_path = File.join(pc_dir, "#{name}.pc")
+      File.write(pc_path, content)
+      pc_dir
+    end
+
+    def setup
+      PackageConfig.clear_configure_args_cache
+      @tmpdir = Dir.mktmpdir
+    end
+
+    def teardown
+      FileUtils.rm_rf(@tmpdir)
+    end
+
+    def test_d_flag_mergeback
+      pc_dir = create_pc_file("main-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: main-package
+Description: Main package for testing
+Version: 1.0.0
+Requires: dep-package
+Cflags: -I${includedir}/main -DFOO
+      PC
+      create_pc_file("dep-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: dep-package
+Description: Dependency package
+Version: 1.0.0
+Cflags: -I${includedir}/dep -DFOO
+      PC
+      package = PackageConfig.new("main-package", paths: [pc_dir])
+      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep -DFOO",
+                   package.cflags)
+    end
+
+    def test_w_flag_mergeback
+      pc_dir = create_pc_file("main-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: main-package
+Description: Main package for testing
+Version: 1.0.0
+Requires: dep-package
+Cflags: -I${includedir}/main -Wno-unknown-warning-option
+      PC
+      create_pc_file("dep-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: dep-package
+Description: Dependency package
+Version: 1.0.0
+Cflags: -I${includedir}/dep -Wno-unknown-warning-option
+      PC
+      package = PackageConfig.new("main-package", paths: [pc_dir])
+      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep " +
+                   "-Wno-unknown-warning-option",
+                   package.cflags)
+    end
+
+    def test_wa_wl_wp_flags_not_mergebacked
+      pc_dir = create_pc_file("main-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: main-package
+Description: Main package for testing
+Version: 1.0.0
+Requires: dep-package
+Cflags: -I${includedir}/main -Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO
+      PC
+      create_pc_file("dep-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: dep-package
+Description: Dependency package
+Version: 1.0.0
+Cflags: -I${includedir}/dep -Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO
+      PC
+      package = PackageConfig.new("main-package", paths: [pc_dir])
+      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep " +
+                   "-Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO " +
+                   "-Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO",
+                   package.cflags)
+    end
+
+    def test_mixed_flags_mergeback
+      pc_dir = create_pc_file("main-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: main-package
+Description: Main package for testing
+Version: 1.0.0
+Requires: dep-package
+Cflags: -I${includedir}/main -DFOO -Wall -Wl,--as-needed
+      PC
+      create_pc_file("dep-package", <<-PC)
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: dep-package
+Description: Dependency package
+Version: 1.0.0
+Cflags: -I${includedir}/dep -DFOO -Wall -Wl,--as-needed
+      PC
+      package = PackageConfig.new("main-package", paths: [pc_dir])
+      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep " +
+                   "-Wl,--as-needed -DFOO -Wall -Wl,--as-needed",
+                   package.cflags)
+    end
+  end
 end

@@ -545,6 +545,7 @@ class PackageConfig
         flag.gsub(/\A-I/, "/I")
       end
     end
+    other_flags = mergeback_flags(other_flags)
     [path_flags, other_flags]
   end
 
@@ -577,6 +578,27 @@ class PackageConfig
     rescue StopIteration
     end
     normalized_cflags
+  end
+
+  def mergeback_flags(flags)
+    mergebacked_flags = []
+    flags.each do |flag|
+      if mergeable_flag?(flag)
+        mergebacked_flags.delete(flag)
+      end
+      mergebacked_flags << flag
+    end
+    mergebacked_flags
+  end
+
+  def mergeable_flag?(flag)
+    return false unless flag.start_with?("-")
+    return true if flag.start_with?("-D")
+    if flag.start_with?("-W")
+      return false if flag.start_with?("-Wa,", "-Wl,", "-Wp,")
+      return true
+    end
+    false
   end
 
   def collect_libs
