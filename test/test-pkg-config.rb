@@ -320,25 +320,25 @@ Cflags: -I${includedir}/my-package
       @glib.__send__(:merge_back_cflags, cflags)
     end
 
-    def test_d_flag
+    def test_d
       assert_equal(["-DFOO"],
                    merge_back_cflags(["-DFOO", "-DFOO"]))
     end
 
-    def test_w_flag
+    def test_w
       assert_equal(["-Wno-unknown-warning-option"],
                    merge_back_cflags(["-Wno-unknown-warning-option",
                                       "-Wno-unknown-warning-option"]))
     end
 
-    def test_wa_wl_wp_flags_not_merged_back
+    def test_wa_wl_wp
       assert_equal(["-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO",
                     "-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO"],
                    merge_back_cflags(["-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO",
                                       "-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO"]))
     end
 
-    def test_mixed_flags
+    def test_mixed
       assert_equal(["-Wl,--as-needed", "-DFOO", "-Wall", "-Wl,--as-needed"],
                    merge_back_cflags(["-DFOO", "-Wall", "-Wl,--as-needed",
                                       "-DFOO", "-Wall", "-Wl,--as-needed"]))
