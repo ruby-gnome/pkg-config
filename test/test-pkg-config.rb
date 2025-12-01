@@ -315,126 +315,33 @@ Cflags: -I${includedir}/my-package
     end
   end
 
-  sub_test_case("cflags mergeback") do
-    def create_pc_file(name, content)
-      pc_dir = File.join(@tmpdir, "pkgconfig")
-      FileUtils.mkdir_p(pc_dir)
-      pc_path = File.join(pc_dir, "#{name}.pc")
-      File.write(pc_path, content)
-      pc_dir
+  sub_test_case("#merge_back_cflags") do
+    def merge_back_cflags(cflags)
+      @glib.__send__(:merge_back_cflags, cflags)
     end
 
-    def setup
-      PackageConfig.clear_configure_args_cache
-      @tmpdir = Dir.mktmpdir
+    def test_d_flag
+      assert_equal(["-DFOO"],
+                   merge_back_cflags(["-DFOO", "-DFOO"]))
     end
 
-    def teardown
-      FileUtils.rm_rf(@tmpdir)
+    def test_w_flag
+      assert_equal(["-Wno-unknown-warning-option"],
+                   merge_back_cflags(["-Wno-unknown-warning-option",
+                                      "-Wno-unknown-warning-option"]))
     end
 
-    def test_d_flag_mergeback
-      pc_dir = create_pc_file("main-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: main-package
-Description: Main package for testing
-Version: 1.0.0
-Requires: dep-package
-Cflags: -I${includedir}/main -DFOO
-      PC
-      create_pc_file("dep-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: dep-package
-Description: Dependency package
-Version: 1.0.0
-Cflags: -I${includedir}/dep -DFOO
-      PC
-      package = PackageConfig.new("main-package", paths: [pc_dir])
-      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep -DFOO",
-                   package.cflags)
+    def test_wa_wl_wp_flags_not_merged_back
+      assert_equal(["-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO",
+                    "-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO"],
+                   merge_back_cflags(["-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO",
+                                      "-Wa,--noexecstack", "-Wl,--as-needed", "-Wp,-DFOO"]))
     end
 
-    def test_w_flag_mergeback
-      pc_dir = create_pc_file("main-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: main-package
-Description: Main package for testing
-Version: 1.0.0
-Requires: dep-package
-Cflags: -I${includedir}/main -Wno-unknown-warning-option
-      PC
-      create_pc_file("dep-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: dep-package
-Description: Dependency package
-Version: 1.0.0
-Cflags: -I${includedir}/dep -Wno-unknown-warning-option
-      PC
-      package = PackageConfig.new("main-package", paths: [pc_dir])
-      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep " +
-                   "-Wno-unknown-warning-option",
-                   package.cflags)
-    end
-
-    def test_wa_wl_wp_flags_not_mergebacked
-      pc_dir = create_pc_file("main-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: main-package
-Description: Main package for testing
-Version: 1.0.0
-Requires: dep-package
-Cflags: -I${includedir}/main -Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO
-      PC
-      create_pc_file("dep-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: dep-package
-Description: Dependency package
-Version: 1.0.0
-Cflags: -I${includedir}/dep -Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO
-      PC
-      package = PackageConfig.new("main-package", paths: [pc_dir])
-      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep " +
-                   "-Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO " +
-                   "-Wa,--noexecstack -Wl,--as-needed -Wp,-DFOO",
-                   package.cflags)
-    end
-
-    def test_mixed_flags_mergeback
-      pc_dir = create_pc_file("main-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: main-package
-Description: Main package for testing
-Version: 1.0.0
-Requires: dep-package
-Cflags: -I${includedir}/main -DFOO -Wall -Wl,--as-needed
-      PC
-      create_pc_file("dep-package", <<-PC)
-prefix=/usr/local
-includedir=${prefix}/include
-
-Name: dep-package
-Description: Dependency package
-Version: 1.0.0
-Cflags: -I${includedir}/dep -DFOO -Wall -Wl,--as-needed
-      PC
-      package = PackageConfig.new("main-package", paths: [pc_dir])
-      assert_equal("-I/usr/local/include/main -I/usr/local/include/dep " +
-                   "-Wl,--as-needed -DFOO -Wall -Wl,--as-needed",
-                   package.cflags)
+    def test_mixed_flags
+      assert_equal(["-Wl,--as-needed", "-DFOO", "-Wall", "-Wl,--as-needed"],
+                   merge_back_cflags(["-DFOO", "-Wall", "-Wl,--as-needed",
+                                      "-DFOO", "-Wall", "-Wl,--as-needed"]))
     end
   end
 end
