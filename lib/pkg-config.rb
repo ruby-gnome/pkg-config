@@ -534,7 +534,7 @@ class PackageConfig
       cflags_set << package.declaration("Cflags")
     end
     all_cflags = normalize_cflags(Shellwords.split(cflags_set.join(" ")))
-    path_flags, other_flags = all_cflags.partition {|flag| /\A-I/ =~ flag}
+    path_flags, cflags = all_cflags.partition {|flag| /\A-I/ =~ flag}
     path_flags = path_flags.collect {|flag| normalize_path_flag(flag, "-I")}
     path_flags = path_flags.reject do |flag|
       flag == "-I/usr/include"
@@ -545,8 +545,8 @@ class PackageConfig
         flag.gsub(/\A-I/, "/I")
       end
     end
-    other_flags = mergeback_flags(other_flags)
-    [path_flags, other_flags]
+    cflags = merge_back_cflags(cflags)
+    [path_flags, cflags]
   end
 
   def normalize_path_flag(path_flag, flag_option)
@@ -584,17 +584,17 @@ class PackageConfig
   # This is not a complete reproduction yet, but the goal is to stay compatible.
   # https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/libpkgconf/fragment.c#L381-L416
   #
-  # NOTE: This may be slow because this checks mergebacked_flags N times (where
+  # NOTE: This may be slow because this checks merge_back_cflags N times (where
   # N is the number of mergeable flags).
-  def mergeback_flags(flags)
-    mergebacked_flags = []
-    flags.each do |flag|
-      if mergeable_flag?(flag)
-        mergebacked_flags.delete(flag)
+  def merge_back_cflags(cflags)
+    mergebacked_cflags = []
+    cflags.each do |cflag|
+      if mergeable_flag?(cflag)
+        mergebacked_cflags.delete(cflag)
       end
-      mergebacked_flags << flag
+      mergebacked_cflags << cflag
     end
-    mergebacked_flags
+    mergebacked_cflags
   end
 
   def mergeable_flag?(flag)
