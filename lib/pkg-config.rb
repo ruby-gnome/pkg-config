@@ -580,6 +580,9 @@ class PackageConfig
     normalized_cflags
   end
 
+  # Implementing behavior compatible with pkgconf's pkgconf_fragment_copy().
+  # This is not a complete reproduction yet, but the goal is to stay compatible.
+  # https://github.com/pkgconf/pkgconf/blob/pkgconf-2.5.1/libpkgconf/fragment.c#L381-L416
   def mergeback_flags(flags)
     mergebacked_flags = []
     flags.each do |flag|
