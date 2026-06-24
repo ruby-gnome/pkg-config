@@ -60,3 +60,46 @@ jobs:
       - name: Test
         run: |
           bundle exec rake
+
+  windows-msys2:
+    name: Windows ${{ matrix.msystem }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - msystem: CLANG64
+            package-prefix: mingw-w64-clang-x86_64
+            runner: windows-latest
+          - msystem: CLANGARM64
+            package-prefix: mingw-w64-clang-aarch64
+            runner: windows-11-arm
+          - msystem: MINGW32
+            package-prefix: mingw-w64-i686
+            runner: windows-latest
+          - msystem: MINGW64
+            package-prefix: mingw-w64-x86_64
+            runner: windows-latest
+          - msystem: UCRT64
+            package-prefix: mingw-w64-ucrt-x86_64
+            runner: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          install: >-
+            base-devel
+            ${{ matrix.package-prefix }}-cairo
+            ${{ matrix.package-prefix }}-ruby
+            ${{ matrix.package-prefix }}-toolchain
+      - name: Install dependencies
+        shell: msys2 {0}
+        run: |
+          bundle install
+      - name: Test
+        shell: msys2 {0}
+        run: |
+          bundle exec rake
