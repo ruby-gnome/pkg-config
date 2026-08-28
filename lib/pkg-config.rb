@@ -377,9 +377,10 @@ class PackageConfig
                       out: output,
                       err: File::NULL)
           output.close
+          result = input.read
           _, status = Process.waitpid2(pid)
           return nil unless status.success?
-          input.read
+          result
         rescue SystemCallError
           nil
         end
