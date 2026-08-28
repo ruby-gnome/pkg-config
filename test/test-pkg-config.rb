@@ -1,5 +1,6 @@
 require "mkmf"
 require "tempfile"
+require "timeout"
 
 require "pkg-config"
 
@@ -19,6 +20,18 @@ class PkgConfigTest < Test::Unit::TestCase
     @custom_libdir = "/tmp/local/lib"
     options = {:override_variables => {"libdir" => @custom_libdir}}
     @glib = PackageConfig.new("glib-2.0", options)
+  end
+
+  def test_run_command_drains_output_before_waiting
+    output = Timeout.timeout(5) do
+      PackageConfig.__send__(
+        :run_command,
+        RbConfig.ruby,
+        "-e",
+        "STDOUT.write('x' * 131072)",
+      )
+    end
+    assert_equal(131072, output.bytesize)
   end
 
   def only_pkg_config_version(major, minor)
