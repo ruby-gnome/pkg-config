@@ -343,5 +343,11 @@ Cflags: -I${includedir}/my-package
                    merge_back_cflags(["-DFOO", "-Wall", "-Wl,--as-needed",
                                       "-DFOO", "-Wall", "-Wl,--as-needed"]))
     end
+
+    def test_preserves_the_last_mergeable_occurrence
+      assert_equal(["-O2", "-DFOO", "-Wextra", "-O3"],
+                   merge_back_cflags(["-DFOO", "-O2", "-DFOO",
+                                      "-Wextra", "-O3"]))
+    end
   end
 end
