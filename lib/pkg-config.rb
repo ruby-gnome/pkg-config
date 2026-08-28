@@ -690,7 +690,7 @@ class PackageConfig
 
   def parse_requires(requires)
     return [] if requires.nil?
-    requires_without_version = requires.gsub(/(?:<|>|<=|>=|=)\s*[\d.a-zA-Z_-]+\s*/, "")
+    requires_without_version = requires.gsub(/(?:!=|<=|>=|<|>|=)\s*[^,\s]+\s*/, " ")
     requires_without_version.split(/[,\s]+/)
   end
 
