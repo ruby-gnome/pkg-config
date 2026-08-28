@@ -639,7 +639,7 @@ class PackageConfig
     all_flags = {}
     flags = []
     in_option = false
-    libs_command_line.gsub(/-([Ll]) /, "\\1").split.each do |arg|
+    libs_command_line.gsub(/(-[Ll])\s+/, "\\1").split.each do |arg|
       if in_option
         flags << arg
         in_option = false
