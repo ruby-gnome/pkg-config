@@ -313,6 +313,11 @@ Cflags: -I${includedir}/my-package
       assert_equal(["fribidi"],
                    parse_requires("fribidi = 1.0"))
     end
+
+    def test_multiple_requirements_with_compact_constraints
+      assert_equal(["foo", "bar", "baz"],
+                   parse_requires("foo>=1.2 bar != 2.0, baz=3.0"))
+    end
   end
 
   sub_test_case("#merge_back_cflags") do
