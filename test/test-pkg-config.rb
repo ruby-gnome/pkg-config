@@ -46,6 +46,11 @@ class PkgConfigTest < Test::Unit::TestCase
     @glib.__send__(:split_lib_flags, libs_command_line)
   end
 
+  def test_split_separated_lib_options
+    assert_equal(["-L/tmp/lib", "-lexample"],
+                 split_lib_flags("-L /tmp/lib -l example"))
+  end
+
   def test_split_libs
     assert_equal([
                    "-L/usr/local/Cellar/gtk+3/3.24.10/lib",
