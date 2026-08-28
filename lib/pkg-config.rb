@@ -264,6 +264,14 @@ class PackageConfig
     end
 
     def compute_default_path
+      libdir = ENV["PKG_CONFIG_LIBDIR"]
+      if libdir
+        return [
+          with_config("pkg-config-path") || ENV["PKG_CONFIG_PATH"],
+          libdir,
+        ].compact.join(SEPARATOR)
+      end
+
       default_paths = nil
       if native_pkg_config
         pc_path = run_command(native_pkg_config.to_s,
@@ -315,9 +323,6 @@ class PackageConfig
         mingw_pkgconfig_path = Pathname.new(mingw_bin_path) + "../lib/pkgconfig"
         default_paths.unshift(mingw_pkgconfig_path.cleanpath.to_s)
       end
-      libdir = ENV["PKG_CONFIG_LIBDIR"]
-      default_paths.unshift(libdir) if libdir
-
       paths = []
       if /-darwin\d[\d\.]*\z/ =~ RUBY_PLATFORM and
         /\A(\d+\.\d+)/ =~ run_command("sw_vers", "-productVersion")

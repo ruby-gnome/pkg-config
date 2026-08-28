@@ -21,6 +21,21 @@ class PkgConfigTest < Test::Unit::TestCase
     @glib = PackageConfig.new("glib-2.0", options)
   end
 
+  def test_explicit_libdir_replaces_default_paths
+    original_libdir = ENV["PKG_CONFIG_LIBDIR"]
+    original_path = ENV["PKG_CONFIG_PATH"]
+    ENV["PKG_CONFIG_LIBDIR"] = "/isolated/pkgconfig"
+    ENV["PKG_CONFIG_PATH"] = "/extra/pkgconfig"
+    assert_equal([
+                   "/extra/pkgconfig",
+                   "/isolated/pkgconfig",
+                 ].join(File::PATH_SEPARATOR),
+                 PackageConfig.__send__(:compute_default_path))
+  ensure
+    ENV["PKG_CONFIG_LIBDIR"] = original_libdir
+    ENV["PKG_CONFIG_PATH"] = original_path
+  end
+
   def only_pkg_config_version(major, minor)
     pkg_config_version = `#{@pkgconf} --version`.chomp
     current_major, current_minor = pkg_config_version.split(".").collect(&:to_i)
