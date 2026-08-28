@@ -620,7 +620,6 @@ class PackageConfig
     flags = flags.reject do |flag|
       /\A-L\/usr\/lib(?:64|x32)?\z/ =~ flag
     end
-    flags = flags.uniq
     if @msvc_syntax
       flags = flags.collect do |flag|
         if flag.start_with?("-L")
@@ -638,22 +637,12 @@ class PackageConfig
   def split_lib_flags(libs_command_line)
     all_flags = {}
     flags = []
-    in_option = false
     libs_command_line.gsub(/-([Ll]) /, "\\1").split.each do |arg|
-      if in_option
-        flags << arg
-        in_option = false
-      else
-        case arg
-        when /-[lL]/
-          next if all_flags.key?(arg)
-          all_flags[arg] = true
-          flags << arg
-          in_option = true
-        else
-          flags << arg
-        end
+      if /\A-[lL]/ =~ arg
+        next if all_flags.key?(arg)
+        all_flags[arg] = true
       end
+      flags << arg
     end
     flags
   end

@@ -46,6 +46,22 @@ class PkgConfigTest < Test::Unit::TestCase
     @glib.__send__(:split_lib_flags, libs_command_line)
   end
 
+  def test_split_preserves_repeated_multiargument_options
+    assert_equal([
+                   "-framework", "Cocoa",
+                   "-framework", "Carbon",
+                   "-Xlinker", "--as-needed",
+                   "-Xlinker", "--no-as-needed",
+                   "-Wl,--start-group", "-lfoo", "-Wl,--end-group",
+                   "-Wl,--start-group", "-lbar", "-Wl,--end-group",
+                 ],
+                 split_lib_flags("-framework Cocoa -framework Carbon " +
+                                 "-Xlinker --as-needed " +
+                                 "-Xlinker --no-as-needed " +
+                                 "-Wl,--start-group -lfoo -Wl,--end-group " +
+                                 "-Wl,--start-group -lbar -Wl,--end-group"))
+  end
+
   def test_split_libs
     assert_equal([
                    "-L/usr/local/Cellar/gtk+3/3.24.10/lib",
