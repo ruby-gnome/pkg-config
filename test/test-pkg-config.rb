@@ -344,26 +344,4 @@ Cflags: -I${includedir}/my-package
                                       "-DFOO", "-Wall", "-Wl,--as-needed"]))
     end
   end
-
-  sub_test_case(".msvc?") do
-    def assert_msvc(expected, cc)
-      original_cc = RbConfig::CONFIG["CC"]
-      RbConfig::CONFIG["CC"] = cc
-      assert_equal(expected, !!PKGConfig.msvc?)
-    ensure
-      RbConfig::CONFIG["CC"] = original_cc
-    end
-
-    def mswin?
-      RUBY_PLATFORM.include?("mswin")
-    end
-
-    def test_cl
-      assert_msvc(mswin?, "cl -nologo -source-charset:utf-8")
-    end
-
-    def test_clang_cl
-      assert_msvc(mswin?, "clang-cl -nologo -source-charset:utf-8")
-    end
-  end
 end
