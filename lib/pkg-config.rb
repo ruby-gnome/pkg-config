@@ -35,7 +35,7 @@ module PKGConfig
 
   def msvc?
     /mswin/.match(RUBY_PLATFORM) and
-      /^(?:clang-)?cl\b/.match(RbConfig::CONFIG["CC"])
+      /\A(?:clang-)?cl\b/.match(RbConfig::CONFIG["CC"])
   end
 
   def package_config(package)
