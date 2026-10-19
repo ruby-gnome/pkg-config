@@ -1,5 +1,17 @@
 # NEWS
 
+## 1.6.6 - 2026-10-19
+
+### Improvements
+
+  * Added support for clang-cl.
+    * [ruby-gnome/pkg-config#56](https://github.com/ruby-gnome/pkg-config/issues/56)
+    * Patch by Hiroshi SHIBATA
+
+### Thanks
+
+  * Hiroshi SHIBATA
+
 ## 1.6.5 - 2025-12-01
 
 ### Improvements
