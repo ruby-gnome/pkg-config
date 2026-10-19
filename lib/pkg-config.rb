@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2025  Sutou Kouhei <kou@cozmixng.org>
+# Copyright (C) 2008-2026  Sutou Kouhei <kou@cozmixng.org>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@ require "rbconfig"
 require "shellwords"
 
 module PKGConfig
-  VERSION = "1.6.6"
+  VERSION = "1.6.7"
 
   @@paths = []
   @@override_variables = {}
