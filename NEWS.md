@@ -1,5 +1,18 @@
 # NEWS
 
+## 1.6.7 - 2026-11-04
+
+### Improvements
+
+  * Improved `pkgconf`/`pkg-config` search algorithm: Search `pkgconf`
+    and `pkg-config` in each `PATH` entry.
+    * [apache/arrow#55366](https://github.com/apache/arrow/issues/55366)
+    * Reported by tadeja
+
+### Thanks
+
+  * tadeja
+
 ## 1.6.6 - 2026-10-19
 
 ### Improvements
