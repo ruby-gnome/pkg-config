@@ -1,5 +1,7 @@
 require "mkmf"
+require "fileutils"
 require "tempfile"
+require "tmpdir"
 
 require "pkg-config"
 
@@ -342,6 +344,56 @@ Cflags: -I${includedir}/my-package
       assert_equal(["-Wl,--as-needed", "-DFOO", "-Wall", "-Wl,--as-needed"],
                    merge_back_cflags(["-DFOO", "-Wall", "-Wl,--as-needed",
                                       "-DFOO", "-Wall", "-Wl,--as-needed"]))
+    end
+  end
+
+  sub_test_case(".native_pkg_config") do
+    def setup
+      super
+      original_path = ENV["PATH"]
+      original_pkg_config = ENV["PKG_CONFIG"]
+      begin
+        ENV.delete("PKG_CONFIG")
+        PackageConfig.clear_configure_args_cache
+        Dir.mktmpdir do |tmp_dir|
+          @tmp_dir = tmp_dir
+          yield
+        end
+      ensure
+        ENV["PATH"] = original_path
+        ENV["PKG_CONFIG"] = original_pkg_config
+        PackageConfig.clear_configure_args_cache
+      end
+    end
+
+    def create_executable(dir, name)
+      dir = File.join(@tmp_dir, dir)
+      FileUtils.mkdir_p(dir)
+      path = File.join(dir, "#{name}#{RbConfig::CONFIG["EXEEXT"]}")
+      File.write(path, "")
+      FileUtils.chmod(0755, path)
+      Pathname(path)
+    end
+
+    def native_pkg_config
+      PackageConfig.native_pkg_config
+    end
+
+    def test_prefer_earlier_path_entry
+      pkg_config = create_executable("conda", "pkg-config")
+      pkgconf = create_executable("homebrew", "pkgconf")
+      ENV["PATH"] = [
+        File.dirname(pkg_config),
+        File.dirname(pkgconf),
+      ].join(File::PATH_SEPARATOR)
+      assert_equal(pkg_config, native_pkg_config)
+    end
+
+    def test_prefer_pkgconf_in_same_path_entry
+      create_executable("bin", "pkg-config")
+      pkgconf = create_executable("bin", "pkgconf")
+      ENV["PATH"] = File.dirname(pkgconf)
+      assert_equal(pkgconf, native_pkg_config)
     end
   end
 end
