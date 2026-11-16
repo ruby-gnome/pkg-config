@@ -557,13 +557,21 @@ class PackageConfig
   def normalize_path_flag(path_flag, flag_option)
     return path_flag unless /-mingw(?:32|-ucrt)\z/ === RUBY_PLATFORM
 
-    pkg_config_prefix = self.class.native_pkg_config_prefix
-    return path_flag unless pkg_config_prefix
-
-    mingw_dir = pkg_config_prefix.basename.to_s
+    # Convert MSYS2 path such as /mingw64/include to Windows path such
+    # as C:/msys64/mingw64/include. Ruby knows the Windows path of the
+    # MinGW prefix: RubyInstaller provides it and MSYS2's Ruby is
+    # installed into it.
+    if Object.const_defined?(:RubyInstaller)
+      mingw_bin_path = RubyInstaller::Runtime.msys2_installation.mingw_bin_path
+      mingw_windows_prefix =
+        File.dirname(mingw_bin_path.tr(File::ALT_SEPARATOR, File::SEPARATOR))
+    else
+      mingw_windows_prefix = RbConfig::CONFIG["prefix"]
+    end
+    mingw_dir = File.basename(mingw_windows_prefix)
     path = path_flag.sub(/\A#{Regexp.escape(flag_option)}/, "")
     path = path.sub(/\A\/#{Regexp.escape(mingw_dir)}/i) do
-      pkg_config_prefix.to_s
+      mingw_windows_prefix
     end
     "#{flag_option}#{path}"
   end
