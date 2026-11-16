@@ -1,5 +1,12 @@
 # NEWS
 
+## 1.6.8 - 2026-11-16
+
+### Improvements
+
+  * Stopped to depend on system `pkgconf`/`pkg-config` for MinGW's
+    Windows path detection.
+
 ## 1.6.7 - 2026-11-04
 
 ### Improvements
