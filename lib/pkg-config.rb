@@ -121,11 +121,11 @@ module PKGConfig
                   Shellwords.shellwords(libraries))
       dldflags = dldflags.map {|s| /\s/ =~ s ? "\"#{s}\"" : s }.join(" ")
       $libs   += " " + libraries
-      if /mswin/ =~ RUBY_PLATFORM
-        $DLDFLAGS += " " + dldflags
-      else
-        $LDFLAGS += " " + dldflags
-      end
+      # mkmf uses $LDFLAGS for both have_func()/try_link() and the
+      # final link (mswin's Makefile puts $(ldflags) into DLDFLAGS
+      # too), so /libpath: must go there on mswin as well. With
+      # $DLDFLAGS only, every link check against the package fails.
+      $LDFLAGS += " " + dldflags
       $CFLAGS += " " + cflags_only_other(pkg)
       if defined?($CXXFLAGS)
         $CXXFLAGS += " " + cflags_only_other(pkg)
